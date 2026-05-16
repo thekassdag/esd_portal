@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "src/lib/utils";
 import { GitPullRequestIcon, Menu, Search, Sparkles } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "src/components/ui/avatar";
+import { SupportButton } from "@gurshaplus/sdk";
 import { Button } from "src/components/ui/button";
 import {
   NavigationMenu,
@@ -109,17 +109,17 @@ export default function Navbar() {
                 (link.to === "/browse" && pathname?.startsWith("/browse"));
               return (
                 <NavigationMenuItem key={link.to}>
-                      <NavigationMenuLink
-                        active={active}
-                        className={cn(
-                          navigationMenuTriggerStyle(),
-                          "bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200 text-[13px]",
-                          active && "text-foreground font-semibold"
-                        )}
-                        render={<Link href={link.to} />}
-                      >
-                        {link.label}
-                      </NavigationMenuLink>
+                  <NavigationMenuLink
+                    active={active}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      "bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200 text-[13px]",
+                      active && "text-foreground font-semibold"
+                    )}
+                    render={<Link href={link.to} />}
+                  >
+                    {link.label}
+                  </NavigationMenuLink>
                 </NavigationMenuItem>
               );
             })}
@@ -143,15 +143,12 @@ export default function Navbar() {
             />
           }
         >
-            <GitPullRequestIcon size={15} className="text-muted-foreground group-hover:text-foreground transition-colors" />
-            <span className="text-[13px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
-              102.3k
-            </span>
+          <GitPullRequestIcon size={15} className="text-muted-foreground group-hover:text-foreground transition-colors" />
+          <span className="text-[13px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+            102.3k
+          </span>
         </Button>
-        <Avatar className="size-8 ring-1 ring-border cursor-pointer hover:ring-primary/30 transition-all">
-          <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="User" />
-          <AvatarFallback className="text-xs font-medium">U</AvatarFallback>
-        </Avatar>
+        <SupportButton label="Support Us" creator="thekassdag" variant="popup" />
       </div>
     </nav>
   );
