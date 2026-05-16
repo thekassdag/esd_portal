@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import {
   MapPin,
   CheckCircle2,
@@ -101,7 +103,7 @@ function Stars({ rating }: { rating: number }) {
 
 /* ─── Profile Page ─── */
 export default function ProfilePage() {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <div className="relative min-h-screen gradient-bg pt-16 overflow-hidden">
@@ -146,33 +148,69 @@ export default function ProfilePage() {
                   {/* Social links */}
                   <div className="flex items-center justify-center md:justify-start gap-2 mt-4">
                     <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                          <a href={TALENT.socials.github} target="_blank" rel="noopener noreferrer">
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="size-8 rounded-full"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href={TALENT.socials.github}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
+                            }
+                          >
                             <GitCommitIcon size={15} />
-                          </a>
-                        </Button>
-                      </TooltipTrigger>
+                          </Button>
+                        }
+                      />
                       <TooltipContent>GitHub</TooltipContent>
                     </Tooltip>
                     <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                          <a href={TALENT.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="size-8 rounded-full"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href={TALENT.socials.linkedin}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
+                            }
+                          >
                             <LinkIcon size={15} />
-                          </a>
-                        </Button>
-                      </TooltipTrigger>
+                          </Button>
+                        }
+                      />
                       <TooltipContent>LinkedIn</TooltipContent>
                     </Tooltip>
                     <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                          <a href={TALENT.socials.behance} target="_blank" rel="noopener noreferrer">
+                      <TooltipTrigger
+                        render={
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="size-8 rounded-full"
+                            nativeButton={false}
+                            render={
+                              <a
+                                href={TALENT.socials.behance}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              />
+                            }
+                          >
                             <BehanceIcon size={15} />
-                          </a>
-                        </Button>
-                      </TooltipTrigger>
+                          </Button>
+                        }
+                      />
                       <TooltipContent>Behance</TooltipContent>
                     </Tooltip>
                   </div>
@@ -245,10 +283,20 @@ export default function ProfilePage() {
           <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
             <CardHeader className="p-5 pb-0 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-base font-bold text-foreground">Projects</CardTitle>
-              <Button variant="link" size="sm" className="h-auto p-0 text-primary text-xs" asChild>
-                <a href={`https://t.me/${TALENT.telegramChannel}`} target="_blank" rel="noopener noreferrer">
-                  View All <ChevronRight size={12} className="ml-0.5" />
-                </a>
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-primary text-xs"
+                nativeButton={false}
+                render={
+                  <a
+                    href={`https://t.me/${TALENT.telegramChannel}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+              >
+                View All <ChevronRight size={12} className="ml-0.5" />
               </Button>
             </CardHeader>
             <CardContent className="p-5">

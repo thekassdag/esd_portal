@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useRef, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { ArrowUp, Paperclip, Sparkles, Zap, Globe, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,7 +29,7 @@ export default function HeroPage() {
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -39,7 +41,7 @@ export default function HeroPage() {
 
   const handleSubmit = () => {
     if (!query.trim()) return;
-    navigate(`/browse?q=${encodeURIComponent(query.trim())}`);
+    router.push(`/browse?q=${encodeURIComponent(query.trim())}`);
   };
 
   const handleKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

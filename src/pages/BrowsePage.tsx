@@ -1,8 +1,10 @@
+"use client";
+
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Search, MapPin, CheckCircle2, Star, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useSearchParams } from "react-router-dom";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -47,7 +49,7 @@ const LEVEL_STYLES: Record<string, string> = {
 
 /* ─── Talent Card ─── */
 function TalentCard({ talent, index }: { talent: Talent; index: number }) {
-  const navigate = useNavigate();
+  const router = useRouter();
 
   return (
     <Card
@@ -55,7 +57,7 @@ function TalentCard({ talent, index }: { talent: Talent; index: number }) {
         "talent-card glass-card rounded-xl cursor-pointer border-border/50 animate-fade-in",
         `stagger-${index + 1}`
       )}
-      onClick={() => navigate(`/browse/${talent.id}`)}
+      onClick={() => router.push(`/browse/${talent.id}`)}
     >
       <CardContent className="p-4">
         <div className="flex items-start gap-3">
@@ -110,7 +112,7 @@ function TalentCard({ talent, index }: { talent: Talent; index: number }) {
 
 /* ─── Browse Page ─── */
 export default function BrowsePage() {
-  const [searchParams] = useSearchParams();
+  const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") ?? "a Senior UI Architect for a fintech platform.";
   const [query, setQuery] = useState(initialQuery);
   const [activeFilter, setActiveFilter] = useState("All");

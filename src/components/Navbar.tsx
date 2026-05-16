@@ -1,4 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { cn } from "src/lib/utils";
 import { GitPullRequestIcon, Menu, Search, Sparkles } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "src/components/ui/avatar";
@@ -24,10 +27,10 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const location = useLocation();
+  const pathname = usePathname();
 
   const Logo = () => (
-    <Link to="/" className="flex items-center gap-2.5 group">
+    <Link href="/" className="flex items-center gap-2.5 group">
       <div className="relative flex items-center justify-center size-7 rounded-lg bg-primary shadow-sm shadow-primary/20 group-hover:shadow-primary/30 transition-shadow">
         <span className="text-[11px] font-black text-primary-foreground tracking-tight">
           E
@@ -45,12 +48,18 @@ export default function Navbar() {
         {/* Mobile Hamburger */}
         <div className="md:hidden">
           <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="size-9 text-muted-foreground hover:text-foreground">
-                <Menu size={18} />
-                <span className="sr-only">Toggle navigation menu</span>
-              </Button>
-            </SheetTrigger>
+            <SheetTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9 text-muted-foreground hover:text-foreground"
+                >
+                  <Menu size={18} />
+                  <span className="sr-only">Toggle navigation menu</span>
+                </Button>
+              }
+            />
             <SheetContent side="left" className="w-[280px] sm:w-[320px] p-0">
               <div className="p-5 border-b border-border/50">
                 <Logo />
@@ -58,24 +67,27 @@ export default function Navbar() {
               <div className="flex flex-col gap-0.5 p-3">
                 {navLinks.map((link) => {
                   const active =
-                    location.pathname === link.to ||
-                    (link.to === "/browse" && location.pathname.startsWith("/browse"));
+                    pathname === link.to ||
+                    (link.to === "/browse" && pathname?.startsWith("/browse"));
                   const Icon = link.icon;
                   return (
-                    <SheetClose asChild key={link.to}>
-                      <Link
-                        to={link.to}
-                        className={cn(
-                          "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
-                          active
-                            ? "bg-primary/8 text-primary"
-                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
-                        )}
-                      >
-                        <Icon size={16} className={active ? "text-primary" : ""} />
-                        {link.label}
-                      </Link>
-                    </SheetClose>
+                    <SheetClose
+                      key={link.to}
+                      render={
+                        <Link
+                          href={link.to}
+                          className={cn(
+                            "flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200",
+                            active
+                              ? "bg-primary/8 text-primary"
+                              : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                          )}
+                        >
+                          <Icon size={16} className={active ? "text-primary" : ""} />
+                          {link.label}
+                        </Link>
+                      }
+                    />
                   );
                 })}
               </div>
@@ -93,21 +105,21 @@ export default function Navbar() {
           <NavigationMenuList className="gap-0.5">
             {navLinks.map((link) => {
               const active =
-                location.pathname === link.to ||
-                (link.to === "/browse" && location.pathname.startsWith("/browse"));
+                pathname === link.to ||
+                (link.to === "/browse" && pathname?.startsWith("/browse"));
               return (
                 <NavigationMenuItem key={link.to}>
-                  <NavigationMenuLink
-                    asChild
-                    active={active}
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      "bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200 text-[13px]",
-                      active && "text-foreground font-semibold"
-                    )}
-                  >
-                    <Link to={link.to}>{link.label}</Link>
-                  </NavigationMenuLink>
+                      <NavigationMenuLink
+                        active={active}
+                        className={cn(
+                          navigationMenuTriggerStyle(),
+                          "bg-transparent text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200 text-[13px]",
+                          active && "text-foreground font-semibold"
+                        )}
+                        render={<Link href={link.to} />}
+                      >
+                        {link.label}
+                      </NavigationMenuLink>
                 </NavigationMenuItem>
               );
             })}
@@ -121,19 +133,20 @@ export default function Navbar() {
           variant="outline"
           size="sm"
           className="hidden md:flex h-8 gap-2 px-3 rounded-lg border-border/50 bg-background/50 backdrop-blur-sm hover:bg-accent hover:border-border transition-all group"
-          asChild
+          nativeButton={false}
+          render={
+            <a
+              href="https://github.com/dagimafro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3"
+            />
+          }
         >
-          <a
-            href="https://github.com/dagimafro"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3"
-          >
             <GitPullRequestIcon size={15} className="text-muted-foreground group-hover:text-foreground transition-colors" />
             <span className="text-[13px] font-medium text-muted-foreground group-hover:text-foreground transition-colors">
               102.3k
             </span>
-          </a>
         </Button>
         <Avatar className="size-8 ring-1 ring-border cursor-pointer hover:ring-primary/30 transition-all">
           <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="User" />
