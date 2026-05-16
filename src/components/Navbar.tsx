@@ -1,6 +1,6 @@
-import { Bell, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const navLinks = [
   { label: "Find Talent", to: "/" },
@@ -12,7 +12,7 @@ export default function Navbar() {
   const location = useLocation();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-14 bg-white/60 backdrop-blur-xl border-b border-white/70 shadow-sm">
+    <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 h-14 bg-background/60 backdrop-blur-xl border-b border-border shadow-sm">
       {/* Logo */}
       <div className="flex items-center gap-2">
         <div className="w-0.5 h-5 bg-primary rounded-full" />
@@ -22,7 +22,7 @@ export default function Navbar() {
       </div>
 
       {/* Nav links */}
-      <div className="flex items-center gap-6">
+      <div className="hidden md:flex items-center gap-6">
         {navLinks.map((link) => {
           const active =
             location.pathname === link.to ||
@@ -46,13 +46,10 @@ export default function Navbar() {
 
       {/* Actions */}
       <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 ring-2 ring-primary/20 overflow-hidden">
-          <img
-            src="https://api.dicebear.com/7.x/avataaars/svg?seed=user"
-            alt="User"
-            className="w-full h-full object-cover"
-          />
-        </div>
+        <Avatar className="size-8 ring-2 ring-primary/20">
+          <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" alt="User" />
+          <AvatarFallback>U</AvatarFallback>
+        </Avatar>
       </div>
     </nav>
   );

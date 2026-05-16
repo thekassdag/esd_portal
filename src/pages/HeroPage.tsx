@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowUp, Paperclip } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 const TAGS = [
   "Mobile App",
@@ -48,22 +50,22 @@ export default function HeroPage() {
     <div className="relative min-h-screen gradient-bg flex flex-col overflow-hidden">
       {/* Decorative blobs */}
       <div
-        className="blob w-[500px] h-[500px] bg-blue-400 top-[-120px] left-[-100px]"
+        className="blob w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-blue-400 top-[-120px] left-[-100px]"
         style={{ opacity: 0.18 }}
       />
       <div
-        className="blob w-[400px] h-[400px] bg-indigo-400 bottom-0 right-[-80px]"
+        className="blob w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-indigo-400 bottom-0 right-[-80px]"
         style={{ opacity: 0.18 }}
       />
       <div
-        className="blob w-[300px] h-[300px] bg-sky-300 top-[30%] right-[15%]"
+        className="blob w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-sky-300 top-[30%] right-[15%]"
         style={{ opacity: 0.14 }}
       />
 
       {/* Main content */}
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-12 relative z-10">
         {/* Headline */}
-        <h1 className="text-5xl md:text-6xl font-black text-center leading-tight mb-4 animate-fade-in">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-center leading-tight mb-4 animate-fade-in">
           <span className="text-slate-800">What are we </span>
           <span
             className="text-transparent bg-clip-text"
@@ -91,7 +93,7 @@ export default function HeroPage() {
               : "shadow-slate-200/50"
           )}
         >
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -99,50 +101,56 @@ export default function HeroPage() {
             onBlur={() => setFocused(false)}
             onKeyDown={handleKey}
             placeholder={PLACEHOLDER}
-            rows={4}
-            className="w-full bg-transparent px-6 pt-5 pb-2 text-sm text-slate-700 placeholder-slate-400 resize-none outline-none leading-relaxed"
+            className="w-full bg-transparent border-none px-6 pt-5 pb-2 text-sm text-slate-700 placeholder-slate-400 resize-none outline-none ring-0 focus-visible:ring-0 leading-relaxed min-h-[120px]"
           />
           <div className="flex items-center justify-between px-5 pb-4 pt-1">
             {/* Upload button */}
-            <button className="flex items-center gap-1.5 text-xs text-slate-500 bg-white/70 hover:bg-white border border-slate-200 rounded-full px-3 py-1.5 transition-all hover:border-primary/40">
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 gap-1.5 text-xs text-slate-500 bg-white/70 hover:bg-white border-slate-200 rounded-full transition-all hover:border-primary/40"
+            >
               <Paperclip size={13} />
               Upload
-            </button>
+            </Button>
 
             {/* Send button */}
-            <button
+            <Button
+              size="icon"
               onClick={handleSubmit}
               disabled={!query.trim()}
               className={cn(
-                "w-9 h-9 rounded-full flex items-center justify-center transition-all duration-200",
+                "size-9 rounded-full transition-all duration-200",
                 query.trim()
                   ? "bg-primary shadow-md shadow-blue-300/50 hover:scale-105 hover:shadow-blue-400/60 text-white"
-                  : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                  : "bg-slate-200 text-slate-400"
               )}
             >
               <ArrowUp size={17} />
-            </button>
+            </Button>
           </div>
         </div>
 
         {/* Suggestion chips */}
         <div className="flex flex-wrap gap-2 mt-6 justify-center animate-fade-in">
           {TAGS.map((tag) => (
-            <button
+            <Button
               key={tag}
+              variant="outline"
+              size="sm"
               onClick={() => setQuery((prev) => (prev ? prev + ", " + tag : tag))}
-              className="text-xs text-slate-600 bg-white/60 hover:bg-white border border-slate-200/80 rounded-full px-4 py-1.5 transition-all hover:border-primary/40 hover:text-primary hover:shadow-sm backdrop-blur-sm"
+              className="h-8 text-xs text-slate-600 bg-white/60 hover:bg-white border-slate-200/80 rounded-full px-4 transition-all hover:border-primary/40 hover:text-primary hover:shadow-sm backdrop-blur-sm"
             >
               {tag}
-            </button>
+            </Button>
           ))}
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-4 gap-12 mt-16 animate-fade-in">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mt-16 animate-fade-in">
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-2xl font-black text-slate-800">{stat.value}</p>
+              <p className="text-xl md:text-2xl font-black text-slate-800">{stat.value}</p>
               <p className="text-[10px] font-semibold text-muted-foreground tracking-widest mt-1">
                 {stat.label}
               </p>

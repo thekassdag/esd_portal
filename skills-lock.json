@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "skills": {
+    "color-palette": {
+      "source": "jezweb/claude-skills",
+      "sourceType": "github",
+      "skillPath": "plugins/design-assets/skills/color-palette/SKILL.md",
+      "computedHash": "3582196d9fa3c0dd3e41b645986f373f2ac0c0c3b7e84b6f84922686d54fe181"
+    },
+    "frontend-design": {
+      "source": "anthropics/skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "063a0e6448123cd359ad0044cc46b0e490cc7964d45ef4bb9fd842bd2ffbca67"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "skillPath": "skills/shadcn/SKILL.md",
+      "computedHash": "80a6226e78f6d1fe464214ae0ef449d49d8ffaa3e7704f011e9b418c678ad4d1"
+    }
+  }
+}
