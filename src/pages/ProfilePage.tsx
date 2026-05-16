@@ -104,174 +104,166 @@ export default function ProfilePage() {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen gradient-bg pt-16">
+    <div className="relative min-h-screen gradient-bg pt-16 overflow-hidden">
       {/* Blobs */}
       <div className="blob w-[300px] h-[300px] md:w-[500px] md:h-[400px] bg-ikb-300 top-0 left-[-100px]" style={{ opacity: 0.15 }} />
       <div className="blob w-[250px] h-[250px] md:w-[350px] md:h-[350px] bg-ultramarine-300 bottom-[10%] right-[-60px]" style={{ opacity: 0.14 }} />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="flex flex-col gap-6">
 
-          {/* ── LEFT COLUMN ── */}
-          <div className="lg:col-span-2 flex flex-col gap-5">
 
-            {/* Hero card */}
-            <Card className="glass-card rounded-2xl border-none shadow-md overflow-hidden animate-fade-in">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5">
-                  {/* Avatar */}
-                  <div className="relative flex-shrink-0">
-                    <Avatar className="size-28 ring-4 ring-background shadow-lg">
-                      <AvatarImage src={TALENT.avatar} alt={TALENT.name} />
-                      <AvatarFallback>{TALENT.name[0]}</AvatarFallback>
-                    </Avatar>
-                    <Button
-                      size="icon"
-                      className="absolute bottom-0 right-0 size-8 rounded-full shadow-md"
-                    >
-                      <Plus size={14} />
-                    </Button>
+          {/* Hero card */}
+          <Card className="glass-card rounded-2xl border-none shadow-md overflow-hidden animate-fade-in">
+            <CardContent className="p-6">
+              <div className="flex flex-col md:flex-row items-center md:items-start gap-8">
+                {/* Avatar */}
+                <div className="relative flex-shrink-0">
+                  <Avatar className="size-28 ring-4 ring-background shadow-lg">
+                    <AvatarImage src={TALENT.avatar} alt={TALENT.name} />
+                    <AvatarFallback>{TALENT.name[0]}</AvatarFallback>
+                  </Avatar>
+                  <Button
+                    size="icon"
+                    className="absolute bottom-0 right-0 size-8 rounded-full shadow-md"
+                  >
+                    <Plus size={14} />
+                  </Button>
+                </div>
+
+                {/* Info */}
+                <div className="flex-1 min-w-0 text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                    <h1 className="text-2xl font-black text-foreground">{TALENT.name}</h1>
+                    <CheckCircle2 size={18} className="text-primary" />
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-0.5">{TALENT.title}</p>
+                  <div className="flex items-center justify-center md:justify-start gap-1.5 mt-2 text-xs text-muted-foreground">
+                    <MapPin size={12} />
+                    {TALENT.location}
                   </div>
 
-                  {/* Info */}
-                  <div className="flex-1 min-w-0 text-center sm:text-left">
-                    <div className="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                      <h1 className="text-2xl font-black text-foreground">{TALENT.name}</h1>
-                      <CheckCircle2 size={18} className="text-primary" />
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-0.5">{TALENT.title}</p>
-                    <div className="flex items-center justify-center sm:justify-start gap-1.5 mt-2 text-xs text-muted-foreground">
-                      <MapPin size={12} />
-                      {TALENT.location}
-                    </div>
-
-                    {/* Social links */}
-                    <div className="flex items-center justify-center sm:justify-start gap-2 mt-4">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                            <a href={TALENT.socials.github} target="_blank" rel="noopener noreferrer">
-                              <GitCommitIcon size={15} />
-                            </a>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>GitHub</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                            <a href={TALENT.socials.linkedin} target="_blank" rel="noopener noreferrer">
-                              <LinkIcon size={15} />
-                            </a>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>LinkedIn</TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
-                            <a href={TALENT.socials.behance} target="_blank" rel="noopener noreferrer">
-                              <BehanceIcon size={15} />
-                            </a>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>Behance</TooltipContent>
-                      </Tooltip>
-                    </div>
+                  {/* Social links */}
+                  <div className="flex items-center justify-center md:justify-start gap-2 mt-4">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
+                          <a href={TALENT.socials.github} target="_blank" rel="noopener noreferrer">
+                            <GitCommitIcon size={15} />
+                          </a>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>GitHub</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
+                          <a href={TALENT.socials.linkedin} target="_blank" rel="noopener noreferrer">
+                            <LinkIcon size={15} />
+                          </a>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>LinkedIn</TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button variant="outline" size="icon" className="size-8 rounded-full" asChild>
+                          <a href={TALENT.socials.behance} target="_blank" rel="noopener noreferrer">
+                            <BehanceIcon size={15} />
+                          </a>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Behance</TooltipContent>
+                    </Tooltip>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
 
-            {/* Stats bar */}
-            <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-              <CardContent className="p-5">
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  {[
-                    { label: "Ranking", value: TALENT.earned },
-                    { label: "Month Projects", value: TALENT.projects },
-                    { label: "Total Projects", value: TALENT.projects },
-                  ].map((stat) => (
-                    <div key={stat.label} className="flex flex-col items-center gap-1">
-                      <span className="text-lg md:text-xl font-black text-foreground">{stat.value}</span>
-                      <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{stat.label}</span>
-                    </div>
-                  ))}
+                {/* Actions */}
+                <div className="flex flex-col gap-2.5 w-full md:w-48 shrink-0">
+                  <Button className="w-full gap-2 font-semibold shadow-sm shadow-primary/20" size="lg">
+                    Message
+                    <MessageSquare size={16} />
+                  </Button>
+                  <Button variant="secondary" className="w-full gap-2 font-semibold" size="lg">
+                    Share
+                    <Share2 size={16} />
+                  </Button>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Projects */}
-            <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-              <CardHeader className="p-5 pb-0 flex flex-row items-center justify-between space-y-0">
-                <CardTitle className="text-base font-bold text-foreground">Projects</CardTitle>
-                <Button variant="link" size="sm" className="h-auto p-0 text-primary text-xs" asChild>
-                  <a href={`https://t.me/${TALENT.telegramChannel}`} target="_blank" rel="noopener noreferrer">
-                    View All <ChevronRight size={12} className="ml-0.5" />
-                  </a>
-                </Button>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="columns-1 sm:columns-2 gap-3 [&>div]:break-inside-avoid [&>div]:mb-3">
-                  {TALENT.telegramPosts.map((postId) => (
-                    <TelegramPost
-                      key={postId}
-                      channel={TALENT.telegramChannel}
-                      messageId={postId}
-                    />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+          {/* Stats bar */}
+          <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
+            <CardContent className="p-5">
+              <div className="grid grid-cols-3 gap-4 text-center">
+                {[
+                  { label: "Ranking", value: TALENT.earned },
+                  { label: "Month Projects", value: TALENT.projects },
+                  { label: "Total Projects", value: TALENT.projects },
+                ].map((stat) => (
+                  <div key={stat.label} className="flex flex-col items-center gap-1">
+                    <span className="text-lg md:text-xl font-black text-foreground">{stat.value}</span>
+                    <span className="text-[10px] md:text-xs text-muted-foreground font-medium">{stat.label}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-          {/* ── RIGHT COLUMN ── */}
-          <div className="flex flex-col gap-5">
+          {/* About */}
+          <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-base font-bold">About Me</CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <p className="text-xs text-muted-foreground leading-relaxed">{TALENT.about}</p>
+            </CardContent>
+          </Card>
 
-            {/* Actions */}
-            <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-              <CardContent className="p-5 flex flex-col gap-2">
-                <Button className="w-full gap-2 font-semibold" size="lg">
-                  Message
-                  <MessageSquare size={16} />
-                </Button>
-                <Button variant="secondary" className="w-full gap-2 font-semibold" size="lg">
-                  Share
-                  <Share2 size={16} />
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Skills */}
+          <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
+            <CardHeader className="p-5 pb-2">
+              <CardTitle className="text-base font-bold">Skills</CardTitle>
+            </CardHeader>
+            <CardContent className="p-5 pt-0">
+              <div className="flex flex-wrap gap-2">
+                {TALENT.skills.map((skill) => (
+                  <Badge
+                    key={skill}
+                    variant="secondary"
+                    className="text-xs font-medium px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
+                  >
+                    {skill}
+                  </Badge>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* About */}
-            <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-              <CardHeader className="p-5 pb-2">
-                <CardTitle className="text-base font-bold">About Me</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 pt-0">
-                <p className="text-xs text-muted-foreground leading-relaxed">{TALENT.about}</p>
-              </CardContent>
-            </Card>
+          {/* Projects */}
+          <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
+            <CardHeader className="p-5 pb-0 flex flex-row items-center justify-between space-y-0">
+              <CardTitle className="text-base font-bold text-foreground">Projects</CardTitle>
+              <Button variant="link" size="sm" className="h-auto p-0 text-primary text-xs" asChild>
+                <a href={`https://t.me/${TALENT.telegramChannel}`} target="_blank" rel="noopener noreferrer">
+                  View All <ChevronRight size={12} className="ml-0.5" />
+                </a>
+              </Button>
+            </CardHeader>
+            <CardContent className="p-5">
+              <div className="columns-1 sm:columns-2 gap-3 [&>div]:break-inside-avoid [&>div]:mb-3">
+                {TALENT.telegramPosts.map((postId) => (
+                  <TelegramPost
+                    key={postId}
+                    channel={TALENT.telegramChannel}
+                    messageId={postId}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
 
-            {/* Skills */}
-            <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-              <CardHeader className="p-5 pb-2">
-                <CardTitle className="text-base font-bold">Skills</CardTitle>
-              </CardHeader>
-              <CardContent className="p-5 pt-0">
-                <div className="flex flex-wrap gap-2">
-                  {TALENT.skills.map((skill) => (
-                    <Badge
-                      key={skill}
-                      variant="secondary"
-                      className="text-xs font-medium px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
-                    >
-                      {skill}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
         </div>
       </div>
     </div>

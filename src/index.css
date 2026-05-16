@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/geist";
@@ -9,220 +9,266 @@
 
 @layer base {
   :root {
-    /* Color Scales (HSL components) */
-    --medium-blue-50: 241 100% 95%;
-    --medium-blue-100: 241 100% 90%;
-    --medium-blue-200: 241 100% 80%;
-    --medium-blue-300: 241 100% 70%;
-    --medium-blue-400: 241 100% 60%;
-    --medium-blue-500: 241 100% 50%;
-    --medium-blue-600: 241 100% 40%;
-    --medium-blue-700: 241 100% 30%;
-    --medium-blue-800: 241 100% 20%;
-    --medium-blue-900: 241 100% 10%;
-    --medium-blue-950: 242 100% 7%;
-
-    --ikb-50: 244 56% 95%;
-    --ikb-100: 244 62% 90%;
-    --ikb-200: 242 67% 80%;
-    --ikb-300: 242 66% 70%;
-    --ikb-400: 242 64% 60%;
+    /* ─── Brand Scale: IKB Blue (the 10% accent) ─── */
+    --ikb-50: 244 56% 97%;
+    --ikb-100: 244 50% 94%;
+    --ikb-200: 242 54% 87%;
+    --ikb-300: 242 57% 75%;
+    --ikb-400: 242 60% 62%;
     --ikb-500: 242 63% 50%;
-    --ikb-600: 242 63% 40%;
-    --ikb-700: 242 63% 30%;
-    --ikb-800: 242 63% 20%;
-    --ikb-900: 242 63% 10%;
-    --ikb-950: 240 61% 7%;
+    --ikb-600: 242 63% 42%;
+    --ikb-700: 242 63% 33%;
+    --ikb-800: 242 63% 25%;
+    --ikb-900: 242 63% 16%;
+    --ikb-950: 240 61% 9%;
 
-    --navy-50: 245 100% 95%;
-    --navy-100: 245 100% 91%;
-    --navy-200: 249 100% 80%;
-    --navy-300: 249 100% 70%;
-    --navy-400: 249 100% 60%;
-    --navy-500: 249 100% 50%;
-    --navy-600: 249 100% 40%;
-    --navy-700: 249 100% 30%;
-    --navy-800: 249 100% 20%;
-    --navy-900: 249 100% 10%;
-    --navy-950: 249 100% 7%;
+    /* ─── Neutral Scale: Zinc-Slate (the 60% dominant) ─── */
+    --neutral-50: 240 5% 98%;
+    --neutral-100: 240 5% 96%;
+    --neutral-200: 228 6% 91%;
+    --neutral-300: 225 5% 82%;
+    --neutral-400: 227 5% 62%;
+    --neutral-500: 228 5% 46%;
+    --neutral-600: 228 6% 36%;
+    --neutral-700: 227 7% 27%;
+    --neutral-800: 228 9% 18%;
+    --neutral-900: 229 12% 12%;
+    --neutral-950: 230 16% 6%;
 
-    --ultramarine-50: 244 100% 95%;
-    --ultramarine-100: 244 100% 90%;
-    --ultramarine-200: 245 100% 80%;
-    --ultramarine-300: 245 100% 70%;
-    --ultramarine-400: 245 100% 60%;
-    --ultramarine-500: 245 100% 50%;
-    --ultramarine-600: 245 100% 40%;
-    --ultramarine-700: 245 100% 30%;
-    --ultramarine-800: 245 100% 20%;
-    --ultramarine-900: 245 100% 10%;
-    --ultramarine-950: 245 100% 7%;
+    /* ─── 60-30-10 Semantic Tokens (Light Mode) ─── */
 
-    /* Semantic Tokens */
+    /* 60% — Dominant Neutrals */
     --background: 0 0% 100%;
-    --foreground: var(--ikb-950);
+    --foreground: var(--neutral-950);
     --card: 0 0% 100%;
-    --card-foreground: var(--ikb-900);
+    --card-foreground: var(--neutral-900);
     --popover: 0 0% 100%;
-    --popover-foreground: var(--ikb-950);
+    --popover-foreground: var(--neutral-950);
+
+    /* 30% — Secondary Surfaces (warm neutrals, very subtle blue tint) */
+    --secondary: var(--neutral-100);
+    --secondary-foreground: var(--neutral-900);
+    --muted: var(--neutral-50);
+    --muted-foreground: var(--neutral-500);
+    --accent: var(--neutral-100);
+    --accent-foreground: var(--neutral-900);
+    --border: var(--neutral-200);
+    --input: var(--neutral-200);
+
+    /* 10% — Brand Accent (IKB Blue) */
     --primary: var(--ikb-600);
     --primary-foreground: 0 0% 100%;
-    --secondary: var(--ikb-100);
-    --secondary-foreground: var(--ikb-900);
-    --muted: var(--ikb-50);
-    --muted-foreground: var(--ikb-600);
-    --accent: var(--ikb-100);
-    --accent-foreground: var(--ikb-900);
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: var(--ikb-200);
-    --input: var(--ikb-200);
-    --ring: var(--ikb-600);
-    --radius: 0.625rem;
-    
-    --chart-1: var(--ikb-500);
-    --chart-2: var(--medium-blue-500);
-    --chart-3: var(--navy-500);
-    --chart-4: var(--ultramarine-500);
-    --chart-5: var(--ikb-700);
+    --ring: var(--ikb-500);
 
-    --sidebar: var(--ikb-50);
-    --sidebar-foreground: var(--ikb-950);
+    /* Destructive */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Radius */
+    --radius: 0.625rem;
+
+    /* Charts */
+    --chart-1: var(--ikb-500);
+    --chart-2: 217 91% 60%;
+    --chart-3: 263 70% 50%;
+    --chart-4: 142 72% 29%;
+    --chart-5: 38 92% 50%;
+
+    /* Sidebar */
+    --sidebar: var(--neutral-50);
+    --sidebar-foreground: var(--neutral-950);
     --sidebar-primary: var(--ikb-600);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--ikb-200);
-    --sidebar-accent-foreground: var(--ikb-900);
-    --sidebar-border: var(--ikb-300);
-    --sidebar-ring: var(--ikb-600);
-  }
-  .theme {
-    --font-heading: var(--font-sans);
-    --font-sans: 'Geist Variable', sans-serif;
-  }
-  .dark {
-    --background: var(--ikb-950);
-    --foreground: var(--ikb-50);
-    --card: var(--ikb-900);
-    --card-foreground: var(--ikb-50);
-    --popover: var(--ikb-900);
-    --popover-foreground: var(--ikb-50);
-    --primary: var(--ikb-500);
-    --primary-foreground: 0 0% 100%;
-    --secondary: var(--ikb-800);
-    --secondary-foreground: var(--ikb-50);
-    --muted: var(--ikb-800);
-    --muted-foreground: var(--ikb-400);
-    --accent: var(--ikb-800);
-    --accent-foreground: var(--ikb-50);
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: var(--ikb-800);
-    --input: var(--ikb-800);
-    --ring: var(--ikb-500);
-    
-    --sidebar: var(--ikb-900);
-    --sidebar-foreground: var(--ikb-50);
-    --sidebar-primary: var(--ikb-500);
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--ikb-800);
-    --sidebar-accent-foreground: var(--ikb-50);
-    --sidebar-border: var(--ikb-800);
+    --sidebar-accent: var(--neutral-100);
+    --sidebar-accent-foreground: var(--neutral-900);
+    --sidebar-border: var(--neutral-200);
     --sidebar-ring: var(--ikb-500);
   }
+
+  .theme {
+    --font-heading: 'Outfit', var(--font-sans);
+    --font-sans: 'Geist Variable', system-ui, sans-serif;
+  }
+
+  .dark {
+    /* 60% — Dominant Neutrals (dark) */
+    --background: var(--neutral-950);
+    --foreground: var(--neutral-50);
+    --card: var(--neutral-900);
+    --card-foreground: var(--neutral-50);
+    --popover: var(--neutral-900);
+    --popover-foreground: var(--neutral-50);
+
+    /* 30% — Secondary Surfaces (dark) */
+    --secondary: var(--neutral-800);
+    --secondary-foreground: var(--neutral-50);
+    --muted: var(--neutral-800);
+    --muted-foreground: var(--neutral-400);
+    --accent: var(--neutral-800);
+    --accent-foreground: var(--neutral-50);
+    --border: var(--neutral-800);
+    --input: var(--neutral-800);
+
+    /* 10% — Brand Accent (IKB Blue — slightly brighter in dark) */
+    --primary: var(--ikb-500);
+    --primary-foreground: 0 0% 100%;
+    --ring: var(--ikb-400);
+
+    /* Destructive */
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 98%;
+
+    /* Sidebar */
+    --sidebar: var(--neutral-900);
+    --sidebar-foreground: var(--neutral-50);
+    --sidebar-primary: var(--ikb-500);
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: var(--neutral-800);
+    --sidebar-accent-foreground: var(--neutral-50);
+    --sidebar-border: var(--neutral-800);
+    --sidebar-ring: var(--ikb-400);
+  }
+
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    font-family: 'Geist Variable', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground font-sans;
-    font-family: 'Inter', system-ui, sans-serif;
-  }
-}
-
-/* Custom scrollbar */
+/* ─── Custom Scrollbar ─── */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: hsl(var(--ikb-50));
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--ikb-200));
-  border-radius: 3px;
+  background: hsl(var(--neutral-300));
+  border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--ikb-500));
+  background: hsl(var(--neutral-400));
 }
 
-/* Animated gradient background */
+/* ─── Typography ─── */
+.font-display {
+  font-family: 'Outfit', system-ui, sans-serif;
+}
+
+/* ─── Animated Gradient Background ─── */
 .gradient-bg {
-  background: linear-gradient(135deg, hsl(var(--ikb-50)) 0%, hsl(var(--medium-blue-50)) 30%, hsl(var(--ultramarine-100)) 60%, hsl(var(--navy-100)) 100%);
-  background-size: 400% 400%;
-  animation: gradientShift 8s ease infinite;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, hsla(var(--ikb-500) / 0.06) 0%, transparent 60%),
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--neutral-50)) 100%);
 }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.dark .gradient-bg {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, hsla(var(--ikb-600) / 0.12) 0%, transparent 60%),
+    linear-gradient(180deg, hsl(var(--background)) 0%, hsl(var(--neutral-950)) 100%);
 }
 
-/* Glassmorphism card */
+/* ─── Glassmorphism Card ─── */
 .glass-card {
-  background: hsla(var(--background) / 0.72);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid hsla(var(--border) / 0.85);
+  background: hsla(var(--card) / 0.75);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid hsla(var(--border) / 0.6);
 }
 
-/* Frosted search box */
+.dark .glass-card {
+  background: hsla(var(--card) / 0.6);
+  border: 1px solid hsla(var(--border) / 0.4);
+}
+
+/* ─── Frosted Search Input ─── */
 .frosted-input {
-  background: hsla(var(--background) / 0.82);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid hsla(var(--border) / 0.9);
+  background: hsla(var(--card) / 0.8);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid hsla(var(--border) / 0.7);
 }
 
-/* Glow blob */
+/* ─── Glow Blob ─── */
 .blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.35;
+  filter: blur(100px);
+  opacity: 0.2;
   pointer-events: none;
+  will-change: transform;
 }
 
-/* Talent card hover */
+/* ─── Talent Card Hover ─── */
 .talent-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s ease;
 }
 .talent-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 12px 40px hsla(var(--ikb-500) / 0.18);
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 30px hsla(var(--neutral-950) / 0.06),
+    0 2px 8px hsla(var(--neutral-950) / 0.04);
+  border-color: hsla(var(--ikb-500) / 0.15);
 }
 
-/* Hire button pulse on hover */
-.hire-btn:hover {
-  animation: pulse-glow 0.6s ease-out;
+.dark .talent-card:hover {
+  box-shadow:
+    0 8px 30px hsla(0 0% 0% / 0.3),
+    0 2px 8px hsla(0 0% 0% / 0.2);
+  border-color: hsla(var(--ikb-400) / 0.2);
 }
 
-/* Star rating */
+/* ─── Star Rating ─── */
 .star {
   color: #f59e0b;
 }
 
-/* Progress ring */
+/* ─── Progress Ring ─── */
 .progress-ring {
   transform: rotate(-90deg);
 }
+
+/* ─── Premium Animations ─── */
+@keyframes float-subtle {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(10px, -15px) scale(1.02); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-float {
+  animation: float-subtle 12s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-subtle 15s ease-in-out 3s infinite;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+/* ─── Staggered Fade-in ─── */
+.stagger-1 { animation-delay: 0.05s; }
+.stagger-2 { animation-delay: 0.1s; }
+.stagger-3 { animation-delay: 0.15s; }
+.stagger-4 { animation-delay: 0.2s; }
+.stagger-5 { animation-delay: 0.25s; }
+.stagger-6 { animation-delay: 0.3s; }
+.stagger-7 { animation-delay: 0.35s; }
+.stagger-8 { animation-delay: 0.4s; }
