@@ -50,15 +50,15 @@ export default function HeroPage() {
     <div className="relative min-h-screen gradient-bg flex flex-col overflow-hidden">
       {/* Decorative blobs */}
       <div
-        className="blob w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-blue-400 top-[-120px] left-[-100px]"
+        className="blob w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-ikb-400 top-[-120px] left-[-100px]"
         style={{ opacity: 0.18 }}
       />
       <div
-        className="blob w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-indigo-400 bottom-0 right-[-80px]"
+        className="blob w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-medium-blue-400 bottom-0 right-[-80px]"
         style={{ opacity: 0.18 }}
       />
       <div
-        className="blob w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-sky-300 top-[30%] right-[15%]"
+        className="blob w-[200px] h-[200px] md:w-[300px] md:h-[300px] bg-ultramarine-300 top-[30%] right-[15%]"
         style={{ opacity: 0.14 }}
       />
 
@@ -66,12 +66,12 @@ export default function HeroPage() {
       <div className="flex-1 flex flex-col items-center justify-center px-4 pt-24 pb-12 relative z-10">
         {/* Headline */}
         <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-center leading-tight mb-4 animate-fade-in">
-          <span className="text-slate-800">What are we </span>
+          <span className="text-foreground">What are we </span>
           <span
             className="text-transparent bg-clip-text"
             style={{
               backgroundImage:
-                "linear-gradient(90deg, #2563eb 0%, #93c5fd 60%, #c7d2fe 100%)",
+                "linear-gradient(90deg, hsl(var(--ikb-600)) 0%, hsl(var(--ikb-300)) 60%, hsl(var(--navy-300)) 100%)",
             }}
           >
             building?
@@ -89,8 +89,8 @@ export default function HeroPage() {
             "w-full max-w-2xl rounded-2xl shadow-xl transition-all duration-300 animate-slide-up",
             "frosted-input",
             focused
-              ? "shadow-blue-200/60 ring-2 ring-primary/30"
-              : "shadow-slate-200/50"
+              ? "shadow-primary/20 ring-2 ring-primary/30"
+              : "shadow-foreground/5"
           )}
         >
           <Textarea
@@ -101,14 +101,14 @@ export default function HeroPage() {
             onBlur={() => setFocused(false)}
             onKeyDown={handleKey}
             placeholder={PLACEHOLDER}
-            className="w-full bg-transparent border-none px-6 pt-5 pb-2 text-sm text-slate-700 placeholder-slate-400 resize-none outline-none ring-0 focus-visible:ring-0 leading-relaxed min-h-[120px]"
+            className="w-full bg-transparent border-none px-6 pt-5 pb-2 text-sm text-foreground placeholder-muted-foreground/60 resize-none outline-none ring-0 focus-visible:ring-0 leading-relaxed min-h-[120px]"
           />
           <div className="flex items-center justify-between px-5 pb-4 pt-1">
             {/* Upload button */}
             <Button
               variant="outline"
               size="sm"
-              className="h-8 gap-1.5 text-xs text-slate-500 bg-white/70 hover:bg-white border-slate-200 rounded-full transition-all hover:border-primary/40"
+              className="h-8 gap-1.5 text-xs text-muted-foreground bg-background/70 hover:bg-background border-border rounded-full transition-all hover:border-primary/40"
             >
               <Paperclip size={13} />
               Upload
@@ -122,8 +122,8 @@ export default function HeroPage() {
               className={cn(
                 "size-9 rounded-full transition-all duration-200",
                 query.trim()
-                  ? "bg-primary shadow-md shadow-blue-300/50 hover:scale-105 hover:shadow-blue-400/60 text-white"
-                  : "bg-slate-200 text-slate-400"
+                  ? "bg-primary shadow-md shadow-primary/30 hover:scale-105 hover:shadow-primary/40 text-primary-foreground"
+                  : "bg-muted text-muted-foreground/40"
               )}
             >
               <ArrowUp size={17} />
@@ -139,7 +139,7 @@ export default function HeroPage() {
               variant="outline"
               size="sm"
               onClick={() => setQuery((prev) => (prev ? prev + ", " + tag : tag))}
-              className="h-8 text-xs text-slate-600 bg-white/60 hover:bg-white border-slate-200/80 rounded-full px-4 transition-all hover:border-primary/40 hover:text-primary hover:shadow-sm backdrop-blur-sm"
+              className="h-8 text-xs text-muted-foreground bg-background/60 hover:bg-background border-border rounded-full px-4 transition-all hover:border-primary/40 hover:text-primary hover:shadow-sm backdrop-blur-sm"
             >
               {tag}
             </Button>
@@ -150,7 +150,7 @@ export default function HeroPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 mt-16 animate-fade-in">
           {STATS.map((stat) => (
             <div key={stat.label} className="text-center">
-              <p className="text-xl md:text-2xl font-black text-slate-800">{stat.value}</p>
+              <p className="text-xl md:text-2xl font-black text-foreground">{stat.value}</p>
               <p className="text-[10px] font-semibold text-muted-foreground tracking-widest mt-1">
                 {stat.label}
               </p>

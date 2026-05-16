@@ -106,8 +106,8 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen gradient-bg pt-16">
       {/* Blobs */}
-      <div className="blob w-[300px] h-[300px] md:w-[500px] md:h-[400px] bg-blue-300 top-0 left-[-100px]" style={{ opacity: 0.15 }} />
-      <div className="blob w-[250px] h-[250px] md:w-[350px] md:h-[350px] bg-indigo-300 bottom-[10%] right-[-60px]" style={{ opacity: 0.14 }} />
+      <div className="blob w-[300px] h-[300px] md:w-[500px] md:h-[400px] bg-ikb-300 top-0 left-[-100px]" style={{ opacity: 0.15 }} />
+      <div className="blob w-[250px] h-[250px] md:w-[350px] md:h-[350px] bg-ultramarine-300 bottom-[10%] right-[-60px]" style={{ opacity: 0.14 }} />
 
       <div className="relative z-10 max-w-5xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -263,7 +263,7 @@ export default function ProfilePage() {
                     <Badge
                       key={skill}
                       variant="secondary"
-                      className="text-xs font-medium px-3 py-1 bg-blue-50/50 text-primary border-blue-100 dark:bg-blue-900/20 dark:border-blue-800 hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
+                      className="text-xs font-medium px-3 py-1 bg-primary/10 text-primary border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all cursor-default"
                     >
                       {skill}
                     </Badge>

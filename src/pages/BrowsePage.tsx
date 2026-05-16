@@ -107,8 +107,8 @@ export default function BrowsePage() {
   return (
     <div className="min-h-screen gradient-bg pt-16">
       {/* Blobs */}
-      <div className="blob w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-blue-300 top-0 right-0" style={{ opacity: 0.14 }} />
-      <div className="blob w-[250px] h-[250px] md:w-[300px] md:h-[300px] bg-indigo-300 bottom-0 left-0" style={{ opacity: 0.12 }} />
+      <div className="blob w-[300px] h-[300px] md:w-[400px] md:h-[400px] bg-ikb-300 top-0 right-0" style={{ opacity: 0.14 }} />
+      <div className="blob w-[250px] h-[250px] md:w-[300px] md:h-[300px] bg-ultramarine-300 bottom-0 left-0" style={{ opacity: 0.12 }} />
 
       <div className="relative z-10 max-w-4xl mx-auto px-4 py-8">
         {/* Search bar */}

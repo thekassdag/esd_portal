@@ -1,6 +1,21 @@
 import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "src/lib/utils";
+import { Menu } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "src/components/ui/avatar";
+import { Button } from "src/components/ui/button";
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  navigationMenuTriggerStyle,
+} from "src/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from "src/components/ui/sheet";
 
 const navLinks = [
   { label: "Find Talent", to: "/" },
@@ -11,37 +26,87 @@ const navLinks = [
 export default function Navbar() {
   const location = useLocation();
 
+  const Logo = () => (
+    <div className="flex items-center gap-2">
+      <div className="w-0.5 h-5 bg-primary rounded-full" />
+      <span className="font-bold text-sm text-foreground tracking-tight">
+        E-DC Talent Pool
+      </span>
+    </div>
+  );
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-4 md:px-6 h-14 bg-background/60 backdrop-blur-xl border-b border-border shadow-sm">
-      {/* Logo */}
-      <div className="flex items-center gap-2">
-        <div className="w-0.5 h-5 bg-primary rounded-full" />
-        <span className="font-bold text-sm text-foreground tracking-tight">
-          E-DC Talent Pool
-        </span>
+      <div className="flex items-center gap-4">
+        {/* Mobile Hamburger */}
+        <div className="md:hidden">
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon" className="size-9">
+                <Menu size={20} />
+                <span className="sr-only">Toggle navigation menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] sm:w-[350px] p-0">
+              <div className="p-6 border-b">
+                <Logo />
+              </div>
+              <div className="flex flex-col gap-1 p-4">
+                {navLinks.map((link) => {
+                  const active =
+                    location.pathname === link.to ||
+                    (link.to === "/browse" && location.pathname.startsWith("/browse"));
+                  return (
+                    <SheetClose asChild key={link.to}>
+                      <Link
+                        to={link.to}
+                        className={cn(
+                          "flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors",
+                          active
+                            ? "bg-primary/10 text-primary"
+                            : "text-muted-foreground hover:bg-accent hover:text-foreground"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    </SheetClose>
+                  );
+                })}
+              </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        {/* Logo */}
+        <Logo />
       </div>
 
-      {/* Nav links */}
-      <div className="hidden md:flex items-center gap-6">
-        {navLinks.map((link) => {
-          const active =
-            location.pathname === link.to ||
-            (link.to === "/browse" && location.pathname.startsWith("/browse"));
-          return (
-            <Link
-              key={link.to}
-              to={link.to}
-              className={cn(
-                "text-sm font-medium transition-colors hover:text-primary relative pb-0.5",
-                active
-                  ? "text-primary after:absolute after:bottom-0 after:left-0 after:right-0 after:h-0.5 after:bg-primary after:rounded-full"
-                  : "text-muted-foreground"
-              )}
-            >
-              {link.label}
-            </Link>
-          );
-        })}
+      {/* Desktop Nav links */}
+      <div className="hidden md:flex items-center">
+        <NavigationMenu>
+          <NavigationMenuList className="gap-1">
+            {navLinks.map((link) => {
+              const active =
+                location.pathname === link.to ||
+                (link.to === "/browse" && location.pathname.startsWith("/browse"));
+              return (
+                <NavigationMenuItem key={link.to}>
+                  <NavigationMenuLink
+                    asChild
+                    active={active}
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      "bg-transparent hover:bg-accent/50 hover:text-primary transition-all duration-200",
+                      active && "text-primary font-bold bg-primary/5"
+                    )}
+                  >
+                    <Link to={link.to}>{link.label}</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              );
+            })}
+          </NavigationMenuList>
+        </NavigationMenu>
       </div>
 
       {/* Actions */}
