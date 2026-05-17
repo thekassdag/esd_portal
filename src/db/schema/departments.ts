@@ -3,7 +3,7 @@ import { sql } from "drizzle-orm";
 
 export const departments = mysqlTable("departments", {
   id: varchar("id", { length: 36 })
-    .default(sql`UUID()`)
+    .default(sql`(UUID())`)
     .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),
   code: varchar("code", { length: 50 }),

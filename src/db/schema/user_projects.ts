@@ -4,7 +4,7 @@ import { users } from "./users";
 
 export const userProjects = mysqlTable("user_projects", {
   id: varchar("id", { length: 36 })
-    .default(sql`UUID()`)
+    .default(sql`(UUID())`)
     .primaryKey(),
   userId: varchar("user_id", { length: 36 })
     .references(() => users.id, { onDelete: "cascade" })

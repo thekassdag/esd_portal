@@ -12,7 +12,7 @@ import { departments } from "./departments";
 
 export const users = mysqlTable("users", {
   id: varchar("id", { length: 36 })
-    .default(sql`UUID()`)
+     .default(sql`(UUID())`)
     .primaryKey(),
 
   fullName: varchar("full_name", {
