@@ -1,11 +1,13 @@
 import { relations } from "drizzle-orm";
-import { users } from "./schema/users";
-import { universities } from "./schema/universities";
-import { departments } from "./schema/departments";
-import { socialLinks } from "./schema/social_links";
-import { services } from "./schema/services";
-import { userServices } from "./schema/user_services";
-import { userProjects } from "./schema/user_projects";
+import {
+  users,
+  universities,
+  departments,
+  socialLinks,
+  services,
+  userServices,
+  userProjects,
+} from "./schema";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   university: one(universities, {
