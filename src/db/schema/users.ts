@@ -28,7 +28,7 @@ export const users = mysqlTable("users", {
   departmentId: varchar("department_id", { length: 36 }).references(() => departments.id, { onDelete: "set null" }),
   graduationYear: int("graduation_year"),
 
-  availableForWork: boolean("available_for_work").default(false).notNull(),
+  isActive: boolean("is_active").default(false).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
