@@ -22,7 +22,7 @@ import {
 
 const navLinks = [
   { label: "Find Talent", to: "/", icon: Sparkles },
-  { label: "Browse", to: "/browse", icon: Search },
+  { label: "Browse", to: "/p", icon: Search },
   { label: "Join our community", to: "https://t.me/east_devs_community", icon: Sparkles },
 ];
 
