@@ -6,7 +6,7 @@ import {
 } from '@grammyjs/conversations';
 import { NextRequest, NextResponse } from 'next/server';
 import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview } from './handlers';
-import { EDC_LINKS } from '@/lib/constants';
+import { EDC_LINKS, PROJECT_TYPES } from '@/lib/constants';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
@@ -15,9 +15,10 @@ interface SessionData {
   stage?: 'projectSubmiton' | null;
   data: {
     projectSubmitedMediaMsg?: {
-      mediaGroupId?: string,
-      caption: string;
-      msgIds: number[]
+      mediaGroupId?: string;
+      projectType?: string;
+      caption?: string;
+      msgIds?: number[]
     };
   }
 }
@@ -87,14 +88,29 @@ bot.command("contact", async (ctx) => {
 // and we will foraward to our group with [[accept], [reject]] inline buttons
 // bot.use(createConversation(handleProjectSubmission));
 bot.command('submit', async (ctx) => {
+  const match = ctx.match
+  console.log('match:', match);
+  if (!Object.keys(PROJECT_TYPES).includes(match)) {
+    return ctx.reply(`
+*📋 Usage:*
+\`/submit <project type>\`
+
+*Available project types:*
+${Object.entries(PROJECT_TYPES).map(([type, description]) =>
+      `• \`${type}\`:  _${description}_`
+    ).join('\n')}
+`, { parse_mode: 'Markdown' });
+  }
+
   ctx.session.stage = "projectSubmiton";
+  ctx.session.data.projectSubmitedMediaMsg = { projectType: match };
   await ctx.reply(
-    `📎 *Share Your Project*\n\nSend or forward a message containing:\n- 🖼 A photo or 🎥 a video (or both)\n- 📝 A short caption describing your project\n\n_Keep the caption brief and to the point._`,
+    `📎 *Share Your Project*\n\nSend or forward a message containing:\n- 🖼 A photo or 🎥 a video (or both)\n- 📝 A short caption describing your project\n- 🏷 Project type (one of: ${PROJECT_TYPES})\n\n_Keep the caption brief and to the point._`,
     { parse_mode: 'Markdown' }
   );
 });
 
-bot.callbackQuery(/^pro_review:(.+)$/, (ctx) => handleProjectReview(ctx));
+bot.callbackQuery(/^pro_review:(\d+)\/(\d+):(\d+)\/(accept|reject)$/, (ctx) => handleProjectReview(ctx));
 
 
 // handle the noop callback so it doesn't hang
@@ -112,26 +128,33 @@ bot.on('message', async (ctx) => {
       ctx.reply("Please send a photo or video");
       return;
     };
+    const mediaCaption = ctx.message.caption;
+
+    // init
+    if (mediaCaption) {
+      session.data.projectSubmitedMediaMsg = {
+        ...session.data.projectSubmitedMediaMsg,
+        caption: mediaCaption
+      };
+    }
 
     const newId = ctx.message.message_id;
     const groupId = ctx.message.media_group_id;
 
     if (groupId) {
-      const timerKey = `${ctx.chat.id}:${groupId}`;
-      // Accumulate IDs
-      if (!session.data.projectSubmitedMediaMsg) {
-        session.data.projectSubmitedMediaMsg = {
-          caption: ctx.message.caption || "",
-          mediaGroupId: groupId,
-          msgIds: [],
-        };
-      }
-      session.data.projectSubmitedMediaMsg.msgIds = [
-        ...session.data.projectSubmitedMediaMsg.msgIds,
-        newId
-      ];
+      // set media group id and add message id to the list
+      const prevMsgIds = session.data.projectSubmitedMediaMsg?.msgIds || [];
+      session.data.projectSubmitedMediaMsg = {
+        ...session.data.projectSubmitedMediaMsg,  // ✅ keep caption
+        mediaGroupId: groupId,
+        msgIds: [
+          ...prevMsgIds,
+          newId
+        ]
+      };
 
       // Debounce — clear previous timer and wait for silence
+      const timerKey = `${ctx.chat.id}:${groupId}`;
       if (mediaGroupTimers.has(timerKey)) {
         clearTimeout(mediaGroupTimers.get(timerKey)!);
       }
@@ -139,25 +162,27 @@ bot.on('message', async (ctx) => {
       mediaGroupTimers.set(timerKey, setTimeout(async () => {
         mediaGroupTimers.delete(timerKey);
         if (!session.data.projectSubmitedMediaMsg?.caption) {
+          console.log("No caption found 1");
           ctx.reply("Please only send the photo or video with a caption");
           return;
         }
 
-        const { caption, msgIds } = session.data.projectSubmitedMediaMsg || { caption: "", msgIds: [] };
+        const { caption="", msgIds=[], projectType="" } = session.data.projectSubmitedMediaMsg;
         session.stage = null;
         session.data = {};
-        await handleProjectSubmission(ctx, msgIds, caption);
+        await handleProjectSubmission(ctx, msgIds, caption, projectType);
       }, 500));
 
     } else {
-      if (!ctx.message.caption) {
+      if (!mediaCaption) {
+        console.log("No caption found 2");
         ctx.reply("Please only send the photo or video with a caption");
         return;
       }
       // Single media
       session.stage = null;
       session.data = {};
-      await handleProjectSubmission(ctx, [newId], ctx.message.caption);
+      await handleProjectSubmission(ctx, [newId], mediaCaption, session.data.projectSubmitedMediaMsg?.projectType || "");
     }
   }
 });
