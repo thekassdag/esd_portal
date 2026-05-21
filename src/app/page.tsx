@@ -1,5 +1,3 @@
-import HeroPage from '@/pages/HeroPage';
-
 export default function Page() {
-  return <HeroPage />;
+  return <div>Home</div>;
 }

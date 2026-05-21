@@ -3,8 +3,6 @@ import { Inter } from 'next/font/google';
 import '@fontsource-variable/geist';
 import './tw-animate.css';
 import './globals.css';
-import Navbar from '@/components/Navbar';
-import { TooltipProvider } from '@/components/ui/tooltip';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,11 +18,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} min-h-screen bg-background font-sans antialiased`}>
-        <TooltipProvider>
-          <Navbar />
+      <body className={`${inter.className} min-h-screen gradient-bg font-sans antialiased`} suppressHydrationWarning>
           {children}
-        </TooltipProvider>
       </body>
     </html>
   );
