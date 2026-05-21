@@ -11,6 +11,7 @@ export const userProjects = mysqlTable("user_projects", {
     .notNull(),
   postLink: varchar("post_link", { length: 255 }).unique().notNull(),
   embeddingKey: varchar("embedding_key", { length: 255 }).unique().notNull(),
+  tag: varchar("tag", { length: 50 }).notNull(),
   status: mysqlEnum("status", ["active", "inactive", "flaged"]).default("active").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
