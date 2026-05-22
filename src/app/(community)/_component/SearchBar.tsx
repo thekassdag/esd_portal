@@ -2,11 +2,12 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useUpdateQuery } from "@/hooks";
 
 const SearchBar = () => {
-    const [query, setQuery] = useState("");
+    const searchParams = useSearchParams();
+    const [query, setQuery] = useState(searchParams.get("q") || "");
     const pathname = usePathname();
     const updateQuery = useUpdateQuery();
 

@@ -6,19 +6,22 @@ import { usePathname } from "next/navigation";
 import { fetchServices } from "../_modules/actions";
 import { PROJECT_TYPES } from "@/lib/constants";
 import { useUpdateQuery } from "@/hooks";
+import { useSearchParams } from "next/navigation";
 
 
 const FilterChips = () => {
   const [fillters, setFillters] = useState<{ id: string, name: string, description?: string | null }[]>([]);
-  const pathname = usePathname();
   const updateQuery = useUpdateQuery();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [activeFilter, setActiveFilter] = useState(searchParams.get("tabId"));
 
   useEffect(() => {
     const loadFilters = async () => {
       switch (pathname) {
         case "/talents":
           const services = await fetchServices();
-          setFillters([{ id: "all", name: "All" }, ...services])
+          setFillters([{ id: "All", name: "All" }, ...services])
           break;
         case "/projects":
           setFillters(Object.entries(PROJECT_TYPES).map(([id, description]) => ({ id, name: id.replace("_", " "), description })))
@@ -29,10 +32,9 @@ const FilterChips = () => {
     };
     loadFilters();
   }, [pathname]);
-  const [activeFilter, setActiveFilter] = useState("All");
 
   const handleFilterClick = (filterId: string) => {
-    updateQuery({ tabId: filterId === "all" ? null : filterId });
+    updateQuery({ tabId: filterId });
     setActiveFilter(filterId);
   };
 
