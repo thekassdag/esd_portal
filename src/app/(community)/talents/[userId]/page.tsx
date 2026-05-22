@@ -21,13 +21,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const name = user.fullName || "Unknown Talent";
-  const title = user.headline || user.title || "Professional";
-  const bio = user.bio || user.about || `Check out ${name}'s profile on Talent Pool.`;
-  const avatar = user.profilePictureUrl || user.profilePicture || user.avatarUrl || user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}&backgroundColor=b6e3f4`;
+  const name = user.fullName;
+  const title = user.headline || "---";
+  const bio = user.bio || `Check out ${name}'s profile on E-DC`;
+  const avatar = user.profileImageId ? `${process.env.NEXT_PUBLIC_APP_URL}/files/${user.profileImageId}` : `https://ui-avatars.com/api/?name=${user.fullName}`;
 
   return {
-    title: `${name} | ${title} - Talent Pool`,
+    title: `${name} | ${title} - East Devs Community`,
     description: bio.length > 160 ? `${bio.substring(0, 157)}...` : bio,
     openGraph: {
       title: `${name} | ${title}`,
@@ -51,7 +51,6 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-
   let tgUsername;
   try {
     const { username } = await bot.api.getChat(data.telegramId);
@@ -67,6 +66,7 @@ export default async function Page({ params }: Props) {
     data.socialLinks.map((social: any) => [
       social.platform,
       {
+        username: social.username,
         link: PLATFORMS[social.platform].link.replace(
           "{username}",
           social.username
@@ -75,10 +75,13 @@ export default async function Page({ params }: Props) {
       },
     ])
   );
+
   const user = {
     fullName: data.fullName,
-    headline: "Professional",
-    location: "Addis Ababa, Ethiopia",
+    headline: data.headline || "---",
+    uni: data.university!,
+    gcYear: data.graduationYear!,
+    dep: data.department!,
     avatar: data.profileImageId ? `${process.env.NEXT_PUBLIC_APP_URL}/files/${data.profileImageId}` : `https://ui-avatars.com/api/?name=${data.fullName}`,
     socials: socials,
     tgUsername
@@ -98,7 +101,7 @@ export default async function Page({ params }: Props) {
       {/* <div className="relative z-10 max-w-5xl mx-auto px-4 py-8"> */}
       <div className="flex flex-col gap-6 mt-4">
         <UserHeroCard user={user} />
-        <UserStats stats={stats} />
+        <UserStats stats={stats} githubUsername={socials["github"]?.username} />
         {data?.bio && (
           <UserAbout about={data.bio} />
         )}

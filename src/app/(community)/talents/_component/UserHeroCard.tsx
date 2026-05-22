@@ -4,10 +4,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationDot, faShareNodes, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faLocationDot, faShareNodes, faArrowLeft, faBookTanakh, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { SupportButton } from "@gurshaplus/sdk";
 import { faTelegram } from "@fortawesome/free-brands-svg-icons";
+import { numToOrdinal } from "@/lib/utils";
 
 interface SocialLink {
   [platform: string]: {
@@ -16,13 +17,16 @@ interface SocialLink {
   };
 }
 
+
 interface User {
   fullName: string;
   headline: string;
-  location: string;
   avatar: string;
   socials: SocialLink;
-  tgUsername?: string
+  tgUsername?: string;
+  uni?: any;
+  dep?: any;
+  gcYear?: number;
 }
 
 interface UserHeroCardProps {
@@ -31,6 +35,10 @@ interface UserHeroCardProps {
 
 
 export function UserHeroCard({ user }: UserHeroCardProps) {
+  const isStillStudent = user.gcYear && user.gcYear > new Date().getFullYear();
+  const batch = isStillStudent ? user.gcYear! - user.dep?.years : user.gcYear;
+  const grade = numToOrdinal(new Date().getFullYear() - (user.gcYear! - user.dep!.years));
+  console.log(isStillStudent,user.gcYear,new Date().getFullYear());
   return (
     <Card className="glass-card rounded-2xl border-none shadow-md overflow-hidden animate-fade-in">
 
@@ -64,15 +72,44 @@ export function UserHeroCard({ user }: UserHeroCardProps) {
             </div>
             <p className="text-sm text-muted-foreground mt-0.5">{user.headline}</p>
             <div className="flex items-center justify-center md:justify-start gap-1.5 mt-2 text-xs text-muted-foreground">
-              <FontAwesomeIcon icon={faLocationDot} className="size-3" />
-              {user.location}
+              <FontAwesomeIcon icon={faGraduationCap} className="size-3" />
+              {user.gcYear ? (
+                isStillStudent ? (
+                  <div className="flex items-center gap-1">
+                    {grade}/Yr
+                    <Tooltip>
+                      <TooltipTrigger className="cursor-pointer underline decoration-dotted hover:text-foreground transition-colors">{user.dep?.code}</TooltipTrigger>
+                      <TooltipContent><p>{user.dep?.name}</p></TooltipContent>
+                    </Tooltip>
+                    Student @
+                    <Tooltip>
+                      <TooltipTrigger className="cursor-pointer underline decoration-dotted hover:text-foreground transition-colors">{user.uni?.shortName}</TooltipTrigger>
+                      <TooltipContent><p>{user.uni?.name}</p></TooltipContent>
+                    </Tooltip>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1">
+                    <Tooltip>
+                      <TooltipTrigger className="cursor-pointer underline decoration-dotted hover:text-foreground transition-colors">{user.uni?.shortName}</TooltipTrigger>
+                      <TooltipContent><p>{user.uni?.name}</p></TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                      <TooltipTrigger className="cursor-pointer underline decoration-dotted hover:text-foreground transition-colors">{user.dep?.code}</TooltipTrigger>
+                      <TooltipContent><p>{user.dep?.name}</p></TooltipContent>
+                    </Tooltip>
+                    Class Of {user.gcYear}
+                  </div>
+                )
+              ) : (
+                "East Side Local"
+              )}
             </div>
 
             {/* Socials */}
             <div className="flex items-center justify-center md:justify-start gap-2 mt-4">
               {Object.entries(user.socials).map(([platform, social]) => {
                 const data = social;
-                if(!data.icon) return null; //skip if icon is missing e.g gurshaplus doesn't have an icon and its not the place to put it
+                if (!data.icon) return null; //skip if icon is missing e.g gurshaplus doesn't have an icon and its not the place to put it
                 return (
                   <Tooltip key={platform}>
                     <TooltipTrigger>

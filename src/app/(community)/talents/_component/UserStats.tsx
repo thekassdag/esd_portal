@@ -5,9 +5,10 @@ interface UserStatsProps {
     label: string;
     value: string;
   }[];
+  githubUsername?: string;
 }
 
-export function UserStats({ stats }: UserStatsProps) {
+export function UserStats({ stats, githubUsername }: UserStatsProps) {
   return (
     <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
       <CardHeader className="px-5 pb-2">
@@ -22,6 +23,18 @@ export function UserStats({ stats }: UserStatsProps) {
             </div>
           ))}
         </div>
+        {githubUsername && (
+          <div className="mt-5 pt-4 border-t border-border">
+            <p className="text-xs font-bold text-muted-foreground mb-3 text-center py-2">GitHub Contributions</p>
+            <div className="w-full overflow-x-auto">
+              <img
+                src={`https://ghchart.rshah.org/${githubUsername}`}
+                alt={`${githubUsername}'s GitHub contributions`}
+                className="min-w-[500px] w-full object-contain dark:invert dark:hue-rotate-180"
+              />
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
