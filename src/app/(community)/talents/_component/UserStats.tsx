@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface UserStatsProps {
   stats: {
@@ -10,7 +10,10 @@ interface UserStatsProps {
 export function UserStats({ stats }: UserStatsProps) {
   return (
     <Card className="glass-card rounded-2xl border-none shadow-md animate-fade-in">
-      <CardContent className="p-5">
+      <CardHeader className="px-5 pb-2">
+        <CardTitle className="text-sm font-bold text-muted-foreground">Project Submission Milestones</CardTitle>
+      </CardHeader>
+      <CardContent className="p-5 pt-0">
         <div className="grid grid-cols-3 gap-4 text-center">
           {stats.map((stat) => (
             <div key={stat.label} className="flex flex-col items-center gap-1">

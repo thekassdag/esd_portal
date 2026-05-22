@@ -3,9 +3,13 @@
 import Link from "next/link";
 import { SupportButton } from "@gurshaplus/sdk";
 import { Avatar, AvatarImage } from "src/components/ui/avatar";
+import { usePathname } from "next/navigation";
 
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isTalentPage = pathname !== "/talents" && pathname.startsWith("/talents/");
+
   const Logo = () => (
     <div className="flex items-center gap-3 group">
       <Link href="/">
@@ -35,8 +39,8 @@ export default function Navbar() {
         <Logo />
       </div>
 
-      {/* support button */}
-      <SupportButton label="Donate" creator="thekassdag" variant="popup"/>
+      {/* support button (hide on talents detail page) */}
+      {!isTalentPage && <SupportButton label="Donate" creator="thekassdag" variant="popup"/>}
     </nav>
   );
 }

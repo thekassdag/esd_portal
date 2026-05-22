@@ -1,8 +1,4 @@
-import { Bot } from "grammy";
-import { readFileSync } from "fs";
-import path from "path";
-
-const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN!);
+import bot from "@/lib/telegram-bot";
 
 // a simple 1x1 transparent png as fallback
 const FALLBACK = Buffer.from(
