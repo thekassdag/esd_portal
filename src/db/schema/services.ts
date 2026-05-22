@@ -6,7 +6,6 @@ export const services = mysqlTable("services", {
     .default(sql`(UUID())`)
     .primaryKey(),
   name: varchar("name", { length: 255 }).notNull(),       // e.g. "Frontend"
-  label: varchar("label", { length: 255 }).notNull(),     // e.g. "Frontend Developer"
   description: varchar("description", { length: 500 }),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
