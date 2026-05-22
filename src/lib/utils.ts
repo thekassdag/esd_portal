@@ -15,3 +15,9 @@ export function numToOrdinal(n: number): string {
 
   return `${n}th`;
 }
+
+export function capitalizeFirst(word: string) {
+  if (!word) return "";
+  const trimmed = word.trim().split(" ");
+  return trimmed.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}

@@ -1,7 +1,7 @@
 "use client";
 import { useRef, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { TelegramPost } from "@/components/ui/TelegramPost";
+import { TelegramPost } from "@/components/commen";
 import { useProjects } from "@/app/(community)/_modules/hooks";
 import { PROJECT_TYPES } from "@/lib/constants";
 

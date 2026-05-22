@@ -24,7 +24,7 @@ const SearchBar = () => {
                 onChange={handleSearch}
                 className="flex-1 bg-transparent border-none text-sm text-foreground outline-none ring-0 focus-visible:ring-0 placeholder-muted-foreground h-8"
                 placeholder={
-                    pathname === "/talents" ? "Search for talents by using name or profession headlines..." : "Get talent that did the most simuilar project to your idea and collaborate or hire them"
+                    pathname === "/talents" ? "Search talents by name,headline,campus,department or service they offer" : "Get talent that did the most simuilar project to your idea and collaborate or hire them"
                 }
             />
         </div>

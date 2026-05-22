@@ -33,6 +33,7 @@ export const users = mysqlTable("users", {
   graduationYear: int("graduation_year"),
 
   isActive: boolean("is_active").default(false).notNull(),
+  isTeamMember: boolean("is_team_member").default(false).notNull(),
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

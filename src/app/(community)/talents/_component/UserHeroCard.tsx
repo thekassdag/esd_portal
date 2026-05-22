@@ -36,9 +36,8 @@ interface UserHeroCardProps {
 
 export function UserHeroCard({ user }: UserHeroCardProps) {
   const isStillStudent = user.gcYear && user.gcYear > new Date().getFullYear();
-  const batch = isStillStudent ? user.gcYear! - user.dep?.years : user.gcYear;
-  const grade = numToOrdinal(new Date().getFullYear() - (user.gcYear! - user.dep!.years));
-  console.log(isStillStudent,user.gcYear,new Date().getFullYear());
+  const grade = user?.gcYear && user.dep?.years ? numToOrdinal(new Date().getFullYear() - (user.gcYear - user.dep.years)) : "";
+
   return (
     <Card className="glass-card rounded-2xl border-none shadow-md overflow-hidden animate-fade-in">
 

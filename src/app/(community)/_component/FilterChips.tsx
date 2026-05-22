@@ -18,7 +18,7 @@ const FilterChips = () => {
       switch (pathname) {
         case "/talents":
           const services = await fetchServices();
-          setFillters(services)
+          setFillters([{ id: "all", name: "All" }, ...services])
           break;
         case "/projects":
           setFillters(Object.entries(PROJECT_TYPES).map(([id, description]) => ({ id, name: id.replace("_", " "), description })))
@@ -32,7 +32,7 @@ const FilterChips = () => {
   const [activeFilter, setActiveFilter] = useState("All");
 
   const handleFilterClick = (filterId: string) => {
-    updateQuery({ tabId: filterId });
+    updateQuery({ tabId: filterId === "all" ? null : filterId });
     setActiveFilter(filterId);
   };
 

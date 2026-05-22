@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 
-export function TelegramPost({ postLink, header }: { postLink: string, header?: React.ReactNode }) {
+export default function TelegramPost({ postLink, header }: { postLink: string, header?: React.ReactNode }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -64,7 +64,7 @@ export function TelegramPost({ postLink, header }: { postLink: string, header?: 
 
       <div
         ref={containerRef}
-        className={`w-full [&>iframe]:!rounded-xl transition-opacity duration-500 ${!isLoaded ? 'absolute opacity-0 pointer-events-none' : 'relative opacity-100'} ${header ? '[&>iframe]:-mt-[50px]' : ''}`}
+        className={`w-full [&>iframe]:!rounded-xl transition-opacity duration-500 ${!isLoaded ? 'absolute opacity-0 pointer-events-none' : 'relative opacity-100'} ${header ? '[&>iframe]:-mt-[38px]' : ''}`}
       />
     </div>
   );
