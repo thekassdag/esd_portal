@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Navbar } from '@/app/_component';
+import { Navbar } from '@/components/commen';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { ExploreHeader } from './_component';
 

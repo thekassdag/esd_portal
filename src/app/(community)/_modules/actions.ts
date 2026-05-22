@@ -128,3 +128,15 @@ export async function getProjects(
     throw new Error("Failed to fetch projects");
   }
 }
+
+export async function fetchServices() {
+  const services = await db.query.services.findMany({
+    columns: {
+      id: true,
+      name: true,
+      description: true,
+    },
+  });
+  
+  return services;
+}
