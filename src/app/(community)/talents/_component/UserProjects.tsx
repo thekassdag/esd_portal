@@ -4,6 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TelegramPost } from "@/components/commen";
 import { useProjects } from "@/app/(community)/_modules/hooks";
 import { PROJECT_TYPES } from "@/lib/constants";
+import Masonry from "react-masonry-css";
+
+const breakpointColumnsObj = {
+  default: 2,
+  640: 1
+};
 
 export function UserProjects({ userId }: { userId: string }) {
   const { projects, isLoading, isError, loadMore, hasNextPage, tag, setTag } = useProjects({ initialUserId: userId });
@@ -63,11 +69,14 @@ export function UserProjects({ userId }: { userId: string }) {
             </p>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 gap-3 [&>div]:break-inside-avoid [&>div]:mb-3">
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className="flex w-auto -ml-3"
+            columnClassName="pl-3 bg-clip-padding flex flex-col gap-3"
+          >
             {projects.map((project, index) => (
               <div
-                key={project.postLink}
-                ref={index === projects.length - 1 ? lastProjectElementRef : null}
+                key={project.postLink || project.id}
               >
                 <TelegramPost
                   postLink={project.postLink}
@@ -90,8 +99,13 @@ export function UserProjects({ userId }: { userId: string }) {
                 />
               </div>
             ))}
-          </div>
+          </Masonry>
         )}
+        
+        {hasNextPage && (
+          <div ref={lastProjectElementRef} className="h-4 w-full mt-4" />
+        )}
+        
         <div className="flex justify-center">
           {isLoading && (
             <div className="text-center py-4 text-sm text-muted-foreground">

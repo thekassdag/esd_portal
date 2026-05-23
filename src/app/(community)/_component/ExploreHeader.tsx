@@ -11,9 +11,13 @@ const ExploreHeader = () => {
         <div>
             {/* on profile deatil page hide it /talents/:userId */}
             {!isProfileDetail && <PageHeader />}
-            {['/talents', '/projects'].includes(pathname) && (
+            {['/talents', '/projects', '/podcast'].includes(pathname) && (
                 <>
                     <SearchBar />
+                </>
+            )}
+            {['/talents', '/projects'].includes(pathname) && (
+                <>
                     <FilterChips />
                 </>
             )}

@@ -29,11 +29,13 @@
     "grammy": "^1.43.0",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^1.16.0",
+    "masonic": "^4.1.0",
     "mysql2": "^3.22.3",
     "natural": "^8.1.1",
     "next": "^16.2.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "react-masonry-css": "^1.0.16",
     "shadcn": "^4.7.0",
     "tailwind-merge": "^3.6.0",
     "tw-animate-css": "^1.4.0"

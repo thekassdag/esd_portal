@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import { useProjects } from "@/app/(community)/_modules/hooks";
-import { ProjectCard } from "./ProjectCard";
+import { usePodcasts } from "../_modules/hooks/usePodcasts";
+import { PodcastCard } from "./PodcastCard";
 import Masonry from "react-masonry-css";
 
 const breakpointColumnsObj = {
@@ -11,22 +11,19 @@ const breakpointColumnsObj = {
   640: 1
 };
 
-export function ProjectsPage() {
+export function PodcastsPage() {
   const searchParams = useSearchParams();
   const q = searchParams.get("q") || "";
-  const tabId = searchParams.get("tabId") || "";
 
-  const { projects, isLoading, hasNextPage, loadMore, setQuery, setTag } =
-    useProjects({
+  const { podcasts, isLoading, hasNextPage, loadMore, setQuery } =
+    usePodcasts({
       initialQuery: q,
-      initialTag: tabId,
       limit: 10,
     });
 
   useEffect(() => {
     setQuery(q);
-    setTag(tabId);
-  }, [q, tabId, setQuery, setTag]);
+  }, [q, setQuery]);
 
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useCallback(
@@ -47,35 +44,25 @@ export function ProjectsPage() {
 
   return (
     <div>
-      {/* Notice: query without a tab selected */}
-      {q && !tabId && (
-        <div className="flex items-start gap-2.5 mb-5 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3">
-          <span className="mt-0.5 text-amber-500 text-base leading-none">⚠</span>
-          <p className="text-sm text-amber-600 dark:text-amber-400">
-            Select a <span className="font-semibold">category tab</span> above to enable smart search and see relevance scores for your query.
-          </p>
-        </div>
-      )}
-
       {/* Match count */}
       <p className="text-sm text-muted-foreground mb-5 font-medium">
         Showing{" "}
         <span className="text-primary font-semibold">
-          {projects.length} {projects.length === 1 ? "project" : "projects"}
+          {podcasts.length} {podcasts.length === 1 ? "podcast" : "podcasts"}
         </span>
       </p>
 
-      {projects.length > 0 && (
+      {podcasts.length > 0 && (
         <Masonry
           breakpointCols={breakpointColumnsObj}
           className="flex w-auto -ml-4"
           columnClassName="pl-4 bg-clip-padding flex flex-col gap-4"
         >
-          {projects.map((project, i) => (
-            <ProjectCard
-              key={project.postLink || project.id}
-              project={project}
-              innerRef={i === projects.length - 1 ? lastElementRef : undefined}
+          {podcasts.map((podcast, i) => (
+            <PodcastCard
+              key={podcast.id}
+              podcast={podcast}
+              innerRef={i === podcasts.length - 1 ? lastElementRef : undefined}
             />
           ))}
         </Masonry>
@@ -94,10 +81,10 @@ export function ProjectsPage() {
         </div>
       )}
 
-      {!isLoading && projects.length === 0 && (
+      {!isLoading && podcasts.length === 0 && (
         <div className="flex justify-center mt-6">
           <div className="text-center py-4 text-sm text-muted-foreground">
-            No projects found matching your criteria.
+            No podcasts found matching your criteria.
           </div>
         </div>
       )}

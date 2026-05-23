@@ -42,7 +42,7 @@ const SearchBar = () => {
                     lang="en"
                     className="flex-1 bg-transparent border-none text-sm text-foreground outline-none ring-0 focus-visible:ring-0 placeholder-muted-foreground h-8"
                     placeholder={
-                        pathname === "/talents" ? "Search talents by name, headline, campus, department or service they offer" : "Get talent that did the most similar project to your idea and collaborate or hire them"
+                        pathname === "/talents" ? "Search talents by name, headline, campus, department or service they offer" : pathname === "/podcast" ? "Search podcasts by guest name" : "Get talent that did the most similar project to your idea and collaborate or hire them"
                     }
                 />
             </div>
