@@ -48,6 +48,7 @@ export async function getProjects(
       eq(userProjects.status, "active")
     ];
     let embeddingKeys: string[] = [];
+    let scoreMap: Map<string, number> = new Map();
 
     const offset = (page - 1) * limit;
     let hasNextPage = false;
@@ -71,6 +72,8 @@ export async function getProjects(
       }
 
       embeddingKeys = matches.map((m) => m.id);
+      // score lookup: embeddingKey -> similarity score
+      scoreMap = new Map(matches.map((m) => [m.id, m.score]));
 
       conditions.push(inArray(userProjects.embeddingKey, embeddingKeys));
 
@@ -104,7 +107,7 @@ export async function getProjects(
 
     const projects = await db.query.userProjects.findMany({
       ...queryConfig,
-      columns: { postLink: true, tag: true, user: userId ? false : true },
+      columns: { postLink: true, tag: true, embeddingKey: true, user: userId ? false : true },
     });
 
     /**
@@ -121,7 +124,7 @@ export async function getProjects(
     }
 
     return {
-      data: projects,
+      data: projects.map((p) => ({ ...p, score: scoreMap.get(p.embeddingKey) ?? null })),
       page,
       hasNextPage,
     };

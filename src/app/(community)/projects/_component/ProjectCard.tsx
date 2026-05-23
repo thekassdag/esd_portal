@@ -47,6 +47,12 @@ export function ProjectCard({ project, innerRef }: ProjectCardProps) {
             </Link>
 
             {/* Right — external link */}
+            <div className="flex items-center gap-2">
+              {project.score != null && (
+                  <span className="ml-1 inline-flex items-center rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-medium text-primary whitespace-nowrap">
+                    {Math.round(project.score * 100)}% match
+                  </span>
+                )}
             <a
               href={`https://t.me/${project.postLink}`}
               target="_blank"
@@ -55,6 +61,7 @@ export function ProjectCard({ project, innerRef }: ProjectCardProps) {
             >
               <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="size-3" />
             </a>
+            </div>
           </div>
         }
       />

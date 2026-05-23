@@ -41,6 +41,16 @@ export function ProjectsPage() {
 
   return (
     <div>
+      {/* Notice: query without a tab selected */}
+      {q && !tabId && (
+        <div className="flex items-start gap-2.5 mb-5 rounded-lg border border-amber-500/30 bg-amber-500/5 px-4 py-3">
+          <span className="mt-0.5 text-amber-500 text-base leading-none">⚠</span>
+          <p className="text-sm text-amber-600 dark:text-amber-400">
+            Select a <span className="font-semibold">category tab</span> above to enable smart search and see relevance scores for your query.
+          </p>
+        </div>
+      )}
+
       {/* Match count */}
       <p className="text-sm text-muted-foreground mb-5 font-medium">
         Showing{" "}
