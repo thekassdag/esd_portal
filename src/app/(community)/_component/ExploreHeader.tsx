@@ -6,10 +6,11 @@ import SearchBar from "./SearchBar";
 
 const ExploreHeader = () => {
     const pathname = usePathname();
+    const isProfileDetail = pathname.startsWith('/talents/') && pathname !== '/talents';
     return (
         <div>
             {/* on profile deatil page hide it /talents/:userId */}
-            {!pathname.startsWith('/talents/') && pathname === '/talents' && <PageHeader />}
+            {!isProfileDetail && <PageHeader />}
             {['/talents', '/projects'].includes(pathname) && (
                 <>
                     <SearchBar />

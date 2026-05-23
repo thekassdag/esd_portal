@@ -2,6 +2,7 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 
 
@@ -23,7 +24,7 @@ const PageHeader = () => {
               { label: "Contributors", href: "/contributors" }
             ].map(({ label, href }) => (
 
-              <a
+              <Link
                 key={label}
                 href={href}
                 className={
@@ -35,7 +36,7 @@ const PageHeader = () => {
                   )}
               >
                 {label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

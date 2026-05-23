@@ -24,14 +24,16 @@ async function searchEmbeddings(
     `${process.env.SUPABASE_URL}/functions/v1/search-embedings?${params}`,
     {
       headers: {
-        Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY}`,
+        Authorization: `Bearer ${process.env.BACKEND_TO_SUPABASE_API_KEY}`,
       },
     }
   );
 
   if (!res.ok) throw new Error("Embedding search failed");
 
-  return res.json();
+  const data = await res.json();
+
+  return data?.results;
 }
 
 export async function getProjects(
@@ -102,7 +104,7 @@ export async function getProjects(
 
     const projects = await db.query.userProjects.findMany({
       ...queryConfig,
-      columns: { postLink: true, tag: true,user: userId ? false : true },
+      columns: { postLink: true, tag: true, user: userId ? false : true },
     });
 
     /**
@@ -137,6 +139,6 @@ export async function fetchServices() {
       description: true,
     },
   });
-  
+
   return services;
 }
