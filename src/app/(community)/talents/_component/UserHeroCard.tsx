@@ -4,12 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShareNodes, faArrowLeft, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
+import { faShareNodes, faArrowLeft, faGraduationCap, faMessage } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { SupportButton } from "@gurshaplus/sdk";
 import { faTelegram } from "@fortawesome/free-brands-svg-icons";
 import { numToOrdinal } from "@/lib/utils";
 import { CheckCircle2 } from "lucide-react";
+import { GurshaButton } from "@/components/commen";
 
 interface SocialLink {
   [platform: string]: {
@@ -141,16 +141,16 @@ export function UserHeroCard({ user }: UserHeroCardProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex flex-col gap-2.5 w-full md:w-56 shrink-0">
+          <div className="flex justify-center md:justify-start gap-1 w-full md:w-56">
+            {user.socials["gurshaplus"] && (
+              <GurshaButton label="Buy Me Eriteb" creator={user.socials["gurshaplus"].link} />
+            )}
             {user.tgUsername && (
               <Link href={`https://t.me/${user.tgUsername}`} >
-                <Button className="w-full gap-2 font-semibold shadow-sm shadow-primary/20" size="lg">
-                  Message <FontAwesomeIcon icon={faTelegram} className="size-3.5" />
+                <Button className="font-semibold shadow-sm shadow-primary/30" size="lg">
+                  <FontAwesomeIcon icon={faMessage} className="size-3.5" />
                 </Button>
               </Link>
-            )}
-            {user.socials["gurshaplus"] && (
-              <SupportButton label="Buy Me Eriteb" emoji="🍔" creator={user.socials["gurshaplus"].link} variant="popup" />
             )}
           </div>
 

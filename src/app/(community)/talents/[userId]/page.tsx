@@ -5,6 +5,7 @@ import { getUserDetailsById } from '../_modules/actions';
 import { notFound } from 'next/navigation';
 import { PLATFORMS } from '@/lib/constants';
 import bot from '@/lib/telegram-bot';
+import { capitalizeFirst } from '@/lib/utils';
 
 
 type Props = {
@@ -77,7 +78,7 @@ export default async function Page({ params }: Props) {
   );
 
   const user = {
-    fullName: data.fullName,
+    fullName: capitalizeFirst(data.fullName),
     isTeamMember: data.isTeamMember,
     headline: data.headline || "---",
     uni: data.university!,

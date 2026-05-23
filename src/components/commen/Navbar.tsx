@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { SupportButton } from "@gurshaplus/sdk";
 import { Avatar, AvatarImage } from "src/components/ui/avatar";
 import { usePathname } from "next/navigation";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleDollarToSlot } from "@fortawesome/free-solid-svg-icons";
+import GurshaButton from "./GurshaButton";
 
 
 export default function Navbar() {
@@ -40,7 +42,12 @@ export default function Navbar() {
       </div>
 
       {/* support button (hide on talents detail page) */}
-      {!isTalentPage && <SupportButton label="Donate" creator="thekassdag" variant="popup"/>}
+      {!isTalentPage && (
+        <GurshaButton
+          label="Dontate"
+          creator="thekassdag"
+        />
+      )}
     </nav>
   );
 }
