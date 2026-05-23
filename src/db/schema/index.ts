@@ -6,3 +6,4 @@ export * from "./services";
 export * from "./user_services";
 export * from "./user_projects";
 export * from "./podcast";
+export * from "./legacy_wall";

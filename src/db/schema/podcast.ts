@@ -19,7 +19,7 @@ export const podcasts = mysqlTable("podcasts", {
   ses: int("ses").notNull(),
   eps: int("eps").notNull(),
   postLink: varchar("post_link", { length: 255 }).unique().notNull(),
-  audioLink: varchar("audio_link", { length: 255 }).unique().notNull(),
+  audioLink: varchar("audio_link", { length: 255 }).unique(),
   guest: varchar("guest", { length: 255 }).notNull(),
   streamDate: date("stream_date").notNull(),
 });
