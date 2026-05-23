@@ -6,7 +6,7 @@ import Link from "next/link";
 
 
 
-{/* Page header */}
+// Page header
 const PageHeader = () => {
   const pathname = usePathname();
   return (
@@ -21,7 +21,7 @@ const PageHeader = () => {
               { label: "Talents", href: "/talents" },
               { label: "Projects", href: "/projects" },
               { label: "Podcast", href: "/podcast" },
-              { label: "Contributors", href: "/contributors" }
+              { label: "Legacy Wall", href: "/legacy-wall" }
             ].map(({ label, href }) => (
 
               <Link
