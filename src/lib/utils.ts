@@ -21,3 +21,11 @@ export function capitalizeFirst(word: string) {
   const trimmed = word.trim().split(" ");
   return trimmed.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
+
+export const formatDate = (dateString: string): string => {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};

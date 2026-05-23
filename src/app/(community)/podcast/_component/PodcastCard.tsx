@@ -4,6 +4,7 @@ import { TelegramPost } from "@/components/commen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import type { Podcast } from "../_modules/types";
+import { formatDate } from "@/lib/utils";
 
 interface PodcastCardProps {
   podcast: Podcast;
@@ -33,13 +34,17 @@ export function PodcastCard({ podcast, innerRef }: PodcastCardProps) {
 
             {/* Right — external link & status */}
             <div className="flex items-center gap-2">
-              {isComingSoon && (
+              {isComingSoon ? (
                 <span className="ml-1 inline-flex items-center rounded-full bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-500 whitespace-nowrap">
-                  Coming Soon
+                  {formatDate(podcast.streamDate.toString())}
+                </span>
+              ) : (
+                <span className="ml-1 inline-flex items-center rounded-full px-2 py-0.5 text-[9px] font-medium whitespace-nowrap">
+                  {formatDate(podcast.streamDate.toString())}
                 </span>
               )}
               <a
-                href={`https://t.me/${podcast.postLink || podcast.audioLink}`}
+                href={`https://t.me/${podcast.audioLink || podcast.postLink}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors flex-shrink-0"
