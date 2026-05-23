@@ -3,7 +3,7 @@
 import { TelegramPost } from "@/components/commen";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
-import { Podcast } from "../../_modules/types";
+import type { Podcast } from "../_modules/types";
 
 interface PodcastCardProps {
   podcast: Podcast;
