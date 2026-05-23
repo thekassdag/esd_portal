@@ -78,6 +78,7 @@ export default async function Page({ params }: Props) {
 
   const user = {
     fullName: data.fullName,
+    isTeamMember: data.isTeamMember,
     headline: data.headline || "---",
     uni: data.university!,
     gcYear: data.graduationYear!,

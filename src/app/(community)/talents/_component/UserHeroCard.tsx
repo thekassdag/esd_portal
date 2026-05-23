@@ -4,11 +4,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faLocationDot, faShareNodes, faArrowLeft, faBookTanakh, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
+import { faShareNodes, faArrowLeft, faGraduationCap } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { SupportButton } from "@gurshaplus/sdk";
 import { faTelegram } from "@fortawesome/free-brands-svg-icons";
 import { numToOrdinal } from "@/lib/utils";
+import { CheckCircle2 } from "lucide-react";
 
 interface SocialLink {
   [platform: string]: {
@@ -20,6 +21,7 @@ interface SocialLink {
 
 interface User {
   fullName: string;
+  isTeamMember: boolean;
   headline: string;
   avatar: string;
   socials: SocialLink;
@@ -67,7 +69,16 @@ export function UserHeroCard({ user }: UserHeroCardProps) {
           <div className="flex-1 min-w-0 text-center md:text-left">
             <div className="flex items-center justify-center md:justify-start gap-2 flex-wrap">
               <h1 className="text-2xl font-black text-foreground">{user.fullName}</h1>
-              {/* <FontAwesomeIcon icon={faCircleCheck} className="text-primary size-4" /> */}
+              {user.isTeamMember && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <CheckCircle2 size={20} className="text-primary flex-shrink-0" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>EDC Team Member</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </div>
             <p className="text-sm text-muted-foreground mt-0.5">{user.headline}</p>
             <div className="flex items-center justify-center md:justify-start gap-1.5 mt-2 text-xs text-muted-foreground">

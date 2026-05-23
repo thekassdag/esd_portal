@@ -47,7 +47,7 @@ export function UserCard({ user, index, innerRef }: { user: any; index: number, 
                             {user.isTeamMember && (
                                 <Tooltip>
                                     <TooltipTrigger>
-                                        <CheckCircle2 size={13} className="text-primary flex-shrink-0" />
+                                        <CheckCircle2 size={16} className="text-primary flex-shrink-0" />
                                     </TooltipTrigger>
                                     <TooltipContent>
                                         <p>EDC Team Member</p>
