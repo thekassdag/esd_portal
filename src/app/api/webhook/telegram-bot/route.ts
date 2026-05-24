@@ -12,7 +12,7 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
 // Define your session data shape
 interface SessionData {
-  stage?: 'projectSubmiton' | null;
+  stage?: 'projectSubmission_media' | 'projectSubmission_caption' | null;
   data: {
     projectSubmitedMediaMsg?: {
       mediaGroupId?: string;
@@ -34,12 +34,16 @@ bot.use(conversations());
 
 //check if user is registered
 bot.use(async (ctx, next) => {
+  if (ctx.message?.text === '/exit') {
+    ctx.session.stage = null;
+    ctx.session.data = {};
+    await ctx.conversation.exitAll();
+    return ctx.reply('Exited current conversation/session');
+  }
+
   const user = await getUserByTelegramId(ctx.from?.id.toString() || '');
-  const isRegistered = user && user.fullName && user.universityId && user.departmentId && user.graduationYear && user.profileImageId;
-  if (['/profile', '/services', '/link'].includes(ctx.message?.text || '')) {
-    if (!isRegistered) {
-      return ctx.reply('Please register first to use this bot. Use /register to get started');
-    }
+  if (!user && ['/profile', '/services', '/link', '/submit'].includes(ctx.message?.text?.split(' ')[0] || '')) {
+    return ctx.reply('Please register first to use this bot. Use /register to get started');
   }
   await next();
 });
@@ -81,6 +85,14 @@ bot.command("contact", async (ctx) => {
   });
 });
 
+// /exit to exit current conv or session
+bot.command('exit', async (ctx) => {
+  ctx.session.stage = null;
+  ctx.session.data = {};
+  await ctx.conversation.exitAll();
+  await ctx.reply('Exited current conversation/session');
+});
+
 
 // submit projects
 // /project 
@@ -89,7 +101,6 @@ bot.command("contact", async (ctx) => {
 // bot.use(createConversation(handleProjectSubmission));
 bot.command('submit', async (ctx) => {
   const match = ctx.match
-  console.log('match:', match);
   if (!Object.keys(PROJECT_TYPES).includes(match)) {
     return ctx.reply(`
 *📋 Usage:*
@@ -102,10 +113,10 @@ ${Object.entries(PROJECT_TYPES).map(([type, description]) =>
 `, { parse_mode: 'Markdown' });
   }
 
-  ctx.session.stage = "projectSubmiton";
+  ctx.session.stage = "projectSubmission_media";
   ctx.session.data.projectSubmitedMediaMsg = { projectType: match };
   await ctx.reply(
-    `📎 *Share Your Project*\n\nSend or forward a message containing:\n- 🖼 A photo or 🎥 a video (or both)\n- 📝 A short caption describing your project\n- 🏷 Project type (one of: ${PROJECT_TYPES})\n\n_Keep the caption brief and to the point._`,
+    `Step 1/2: 📎 *Share Your Project Media*\n\nPlease send or forward a photo or video of your project.\n\n(Type /exit to cancel)`,
     { parse_mode: 'Markdown' }
   );
 });
@@ -122,15 +133,14 @@ bot.callbackQuery('noop', async (ctx) => {
 const mediaGroupTimers = new Map<string, NodeJS.Timeout>();
 bot.on('message', async (ctx) => {
   const session = ctx.session;
-  if (session.stage === "projectSubmiton") {
+
+  if (session.stage === "projectSubmission_media") {
     const isMedia = ctx.message.photo || ctx.message.video;
     if (!isMedia) {
-      ctx.reply("Please send a photo or video");
-      return;
+      return ctx.reply("Step 1/2: Please send a photo or video of your project, or type /exit to cancel.");
     };
-    const mediaCaption = ctx.message.caption;
 
-    // init
+    const mediaCaption = ctx.message.caption;
     if (mediaCaption) {
       session.data.projectSubmitedMediaMsg = {
         ...session.data.projectSubmitedMediaMsg,
@@ -142,18 +152,13 @@ bot.on('message', async (ctx) => {
     const groupId = ctx.message.media_group_id;
 
     if (groupId) {
-      // set media group id and add message id to the list
       const prevMsgIds = session.data.projectSubmitedMediaMsg?.msgIds || [];
       session.data.projectSubmitedMediaMsg = {
-        ...session.data.projectSubmitedMediaMsg,  // ✅ keep caption
+        ...session.data.projectSubmitedMediaMsg,
         mediaGroupId: groupId,
-        msgIds: [
-          ...prevMsgIds,
-          newId
-        ]
+        msgIds: [...prevMsgIds, newId]
       };
 
-      // Debounce — clear previous timer and wait for silence
       const timerKey = `${ctx.chat.id}:${groupId}`;
       if (mediaGroupTimers.has(timerKey)) {
         clearTimeout(mediaGroupTimers.get(timerKey)!);
@@ -162,28 +167,46 @@ bot.on('message', async (ctx) => {
       mediaGroupTimers.set(timerKey, setTimeout(async () => {
         mediaGroupTimers.delete(timerKey);
         if (!session.data.projectSubmitedMediaMsg?.caption) {
-          console.log("No caption found 1");
-          ctx.reply("Please only send the photo or video with a caption");
-          return;
+          session.stage = "projectSubmission_caption";
+          return ctx.reply("Step 2/2: Great! Now please send a short caption describing your project.\n\n(Type /exit to cancel)");
         }
 
-        const { caption="", msgIds=[], projectType="" } = session.data.projectSubmitedMediaMsg;
+        const { caption = "", msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg;
         session.stage = null;
         session.data = {};
         await handleProjectSubmission(ctx, msgIds, caption, projectType);
       }, 500));
 
     } else {
+      session.data.projectSubmitedMediaMsg = {
+        ...session.data.projectSubmitedMediaMsg,
+        msgIds: [newId]
+      };
+
       if (!mediaCaption) {
-        console.log("No caption found 2");
-        ctx.reply("Please only send the photo or video with a caption");
-        return;
+        session.stage = "projectSubmission_caption";
+        return ctx.reply("Step 2/2: Great! Now please send a short caption describing your project.\n\n(Type /exit to cancel)");
       }
-      // Single media
+
+      const { caption = "", msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg;
       session.stage = null;
       session.data = {};
-      await handleProjectSubmission(ctx, [newId], mediaCaption, session.data.projectSubmitedMediaMsg?.projectType || "");
+      await handleProjectSubmission(ctx, msgIds, caption, projectType);
     }
+    return;
+  }
+
+  if (session.stage === "projectSubmission_caption") {
+    const caption = ctx.message.text?.trim();
+    if (!caption) {
+      return ctx.reply("Step 2/2: Please send a text caption for your project, or type /exit to cancel.");
+    }
+
+    const { msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg || {};
+    session.stage = null;
+    session.data = {};
+    await handleProjectSubmission(ctx, msgIds, caption, projectType);
+    return;
   }
 });
 

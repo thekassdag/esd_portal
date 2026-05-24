@@ -91,7 +91,7 @@ export function UserCard({ user, index, innerRef }: { user: any; index: number, 
                                     </div>
                                 )
                             ) : (
-                                <span>East Side Local</span>
+                                <span>East Side Local Resident</span>
                             )}
                         </div>
                     </div>

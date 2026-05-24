@@ -21,154 +21,209 @@ async function getUserByTelegramId(telegramId: string) {
     return user;
 }
 
-async function askForFullName(conversation: Conversation, ctx: Context) {
-    await ctx.reply('Welcome to registration! What is your full name?');
-    const update = await conversation.waitFor('message:text');
-    return update.message.text?.trim();
-}
+class OnboardingConversation {
+    private conversation: Conversation;
+    private ctx: Context;
 
-async function askForUniversity(conversation: Conversation, ctx: Context) {
-    const universityList = await db.select().from(universities).orderBy(asc(universities.name)).limit(50);
-    if (!universityList.length) {
-        await ctx.reply('Sorry, no universities are available in the system right now.');
-        return null;
+    constructor(conversation: Conversation, ctx: Context) {
+        this.conversation = conversation;
+        this.ctx = ctx;
     }
 
-    const sample = universityList
-        .slice(0, 15)
-        .map((uni) => `- ${uni.name}${uni.shortName ? ` (${uni.shortName})` : ''}`)
-        .join('\n');
+    private async askForFullName(): Promise<string> {
+        const msg = await this.ctx.reply('[1]: What is your full name?');
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const name = update.message.text?.trim();
+            if (name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) {
+                return name;
+            }
+            await this.ctx.reply(
+                'Please provide your full name (first and last name) with at least 2 characters and at most 50 characters\n\n(Type /exit to exit the conversation)',
+                { reply_parameters: { message_id: msg.message_id } }
+            );
+        }
+    }
 
-    await ctx.reply(`Please type your university name. Here are some examples:\n${sample}`);
+    private async askForHeadline(): Promise<string> {
+        const msg = await this.ctx.reply('[2]: What is your headline?\n\n(Type /exit to exit the conversation)');
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const headline = update.message.text?.trim();
+            if (headline && headline.length >= 2 && headline.length <= 50) {
+                return headline;
+            }
+            await this.ctx.reply(
+                'Please provide your headline with at least 2 characters and at most 50 characters\n\n(Type /exit to exit the conversation)',
+                { reply_parameters: { message_id: msg.message_id } }
+            );
+        }
+    }
 
-    while (true) {
-        const update = await conversation.waitFor('message:text');
-        const answer = update.message.text?.trim();
-        if (!answer) continue;
+    private async askIsStudent(): Promise<boolean> {
+        const kdbMarkup = new InlineKeyboard();
+        kdbMarkup.text('Student', 'edu_status:student');
+        kdbMarkup.text('Local Resident', 'edu_status:local_resident');
 
-        const matched = universityList.find(
-            (uni) =>
-                uni.name.toLowerCase() === answer.toLowerCase() ||
-                uni.shortName?.toLowerCase() === answer.toLowerCase(),
+        const msg = await this.ctx.reply(
+            '[3]: Are you Student on one of East side Universities or East Side Local Resident?',
+            { reply_markup: kdbMarkup }
         );
 
-        if (matched) {
-            return matched;
+        while (true) {
+            const update = await this.conversation.waitForCallbackQuery(/edu_status:.*/, {
+                otherwise: ctx => ctx.reply('Please select an option\n\n(Type /exit to exit the conversation)', { reply_parameters: { message_id: msg.message_id } })
+            });
+            await update.answerCallbackQuery();
+            await update.deleteMessage();
+
+            const choice = update.callbackQuery.data.split(':')[1];
+            if (choice === 'student') return true;
+            if (choice === 'local_resident') return false;
+        }
+    }
+
+    private async askForUniversity(): Promise<string | null> {
+        const universityList = await db
+            .select()
+            .from(universities)
+            .orderBy(asc(universities.name))
+            .limit(50);
+
+        if (!universityList.length) {
+            await this.ctx.reply('Sorry, no universities are available in the system right now.');
+            return null;
         }
 
-        await ctx.reply('I could not find that university. Please type the exact university name again.');
+        const uniSelectMarkup = new InlineKeyboard();
+        for (const uni of universityList) {
+            uniSelectMarkup.text(uni.name, `selected_uni:${uni.shortName}`).row();
+        }
+
+        const msg = await this.ctx.reply('🎓 Select your university:', { reply_markup: uniSelectMarkup });
+
+        while (true) {
+            const update = await this.conversation.waitForCallbackQuery(/selected_uni:.*/, {
+                otherwise: ctx => ctx.reply('Please select an option\n\n(Type /exit to exit the conversation)', { reply_parameters: { message_id: msg.message_id } })
+            });
+            await update.answerCallbackQuery();
+            await update.deleteMessage();
+            return update.callbackQuery.data.split(':')[1];
+        }
+    }
+
+    private async askForDepartment(): Promise<string | null> {
+        const departmentList = await db
+            .select()
+            .from(departments)
+            .orderBy(asc(departments.name))
+            .limit(50);
+
+        if (!departmentList.length) {
+            await this.ctx.reply('Sorry, no departments are available in the system right now.');
+            return null;
+        }
+
+        const kdbMarkup = new InlineKeyboard();
+        for (const dept of departmentList) {
+            kdbMarkup.text(dept.name, `selected_dept:${dept.id}`).row();
+        }
+
+        while (true) {
+            const msg = await this.ctx.reply('Please select your department:', { reply_markup: kdbMarkup });
+
+            const update = await this.conversation.waitForCallbackQuery(/selected_dept:.*/, {
+                otherwise: ctx => ctx.reply('Please select an option\n\n(Type /exit to exit the conversation)', { reply_parameters: { message_id: msg.message_id } })
+            });
+            await update.answerCallbackQuery();
+            await update.deleteMessage();
+            return update.callbackQuery.data.split(':')[1];
+        }
+    }
+
+    private async askForGraduationYear(): Promise<number | null> {
+        await this.ctx.reply('What is your graduation year? Please type a year like 2025.');
+
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const answer = update.message.text?.trim();
+            const year = answer ? Number(answer) : NaN;
+            if (!Number.isNaN(year) && year >= 1900 && year <= 2100) {
+                return year;
+            }
+            await this.ctx.reply('Please type a valid graduation year, for example 2025\n\n(Type /exit to exit the conversation)');
+        }
+    }
+
+    private async askForProfileImage(): Promise<string | null | undefined> {
+        while (true) {
+            await this.ctx.reply(
+                'Please send your profile photo\n\n(Type /skip to skip this step)'
+            );
+
+            const update = await this.conversation.waitFor(['message:text', 'message:photo']);
+            if ('photo' in update.message && update.message.photo?.length) {
+                return update.message.photo.at(-1)?.file_id;
+            }
+
+            if (update.message.text?.trim() === '/skip') {
+                return null;
+            }
+        }
+    }
+
+    private async askForBio(): Promise<string | null> {
+        await this.ctx.reply('Please write a short bio about yourself.');
+
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const bio = update.message.text?.trim();
+            if (!bio || bio.length < 10 || bio.length > 500) {
+                await this.ctx.reply(
+                    'Please write a short bio about yourself (at least 10 characters and at most 500 characters)\n\n(Type /exit to exit the conversation)'
+                );
+                continue;
+            }
+            return bio;
+        }
+    }
+
+    async run(): Promise<void> {
+        let universityId,departmentId,graduationYear;
+        const fullName = await this.askForFullName();
+        const headline = await this.askForHeadline();
+        const isStudent = await this.askIsStudent();
+
+        if (isStudent) {
+            universityId = await this.askForUniversity();
+            departmentId = await this.askForDepartment();
+            graduationYear = await this.askForGraduationYear();
+        }
+
+        const bio = await this.askForBio();
+        const profileImageId = await this.askForProfileImage();
+
+        await db.insert(users).values({
+            fullName,
+            telegramId: this.ctx.from?.id.toString(),
+            headline,
+            bio,
+            universityId,
+            departmentId,
+            graduationYear,
+            profileImageId,
+            isActive: true
+        });
+
+        await this.ctx.reply('Thank you! Your registration is complete. You can now use /profile, /services, and /link.');
     }
 }
 
-async function askForDepartment(conversation: Conversation, ctx: Context) {
-    const departmentList = await db.select().from(departments).orderBy(asc(departments.name)).limit(50);
-    if (!departmentList.length) {
-        await ctx.reply('Sorry, no departments are available in the system right now.');
-        return null;
-    }
-
-    const sample = departmentList
-        .slice(0, 15)
-        .map((dept) => `- ${dept.name}${dept.code ? ` (${dept.code})` : ''}`)
-        .join('\n');
-
-    await ctx.reply(`Please type your department name. Here are some examples:\n${sample}`);
-
-    while (true) {
-        const update = await conversation.waitFor('message:text');
-        const answer = update.message.text?.trim();
-        if (!answer) continue;
-
-        const matched = departmentList.find(
-            (dept) =>
-                dept.name.toLowerCase() === answer.toLowerCase() ||
-                dept.code?.toLowerCase() === answer.toLowerCase(),
-        );
-
-        if (matched) {
-            return matched;
-        }
-
-        await ctx.reply('I could not find that department. Please type the exact department name again.');
-    }
-}
-
-async function askForGraduationYear(conversation: Conversation, ctx: Context) {
-    await ctx.reply('What is your graduation year? Please type a year like 2025.');
-
-    while (true) {
-        const update = await conversation.waitFor('message:text');
-        const answer = update.message.text?.trim();
-        const year = answer ? Number(answer) : NaN;
-        if (!Number.isNaN(year) && year >= 1900 && year <= 2100) {
-            return year;
-        }
-        await ctx.reply('Please type a valid graduation year, for example 2025.');
-    }
-}
-
-async function askForProfileImage(conversation: Conversation, ctx: Context) {
-    await ctx.reply('Please send your profile photo, or send a public image URL.');
-
-    while (true) {
-        const update = await conversation.waitFor(['message:text', 'message:photo']);
-        if ('photo' in update.message && update.message.photo?.length) {
-            return update.message.photo.at(-1)?.file_id;
-        }
-
-        const answer = update.message.text?.trim();
-        if (answer && /^https?:\/\//i.test(answer)) {
-            return answer;
-        }
-
-        await ctx.reply('Please send a photo or a public image URL.');
-    }
-}
-
-async function askForBio(conversation: Conversation, ctx: Context) {
-    await ctx.reply('Please write a short bio about yourself.');
-
-    let update = await conversation.waitFor('message:text');
-    while (!update.message.text?.trim() || update.message.text?.trim().length < 10 || update.message.text?.trim().length > 500) {
-        await ctx.reply('Please write a short bio about yourself (at least 10 characters and at most 500 characters).');
-        update = await conversation.waitFor('message:text');
-    }
-
-    return update.message.text?.trim();
-}
-
+// Entry point — same signature grammY expects for conversations
 async function onboarding(conversation: Conversation, ctx: Context) {
-    const telegramId = ctx.from?.id.toString();
-
-    const fullName = await askForFullName(conversation, ctx);
-    if (!fullName) {
-        await ctx.reply('Registration cancelled because full name was not provided.');
-        return;
-    }
-
-    const university = await askForUniversity(conversation, ctx);
-    if (!university) return;
-
-    const department = await askForDepartment(conversation, ctx);
-    if (!department) return;
-
-    const graduationYear = await askForGraduationYear(conversation, ctx);
-    const profileImageId = await askForProfileImage(conversation, ctx);
-    const bio = await askForBio(conversation, ctx);
-
-
-    await db.insert(users).values({
-        fullName,
-        telegramId,
-        bio,
-        universityId: university.id,
-        departmentId: department.id,
-        graduationYear,
-        profileImageId
-    });
-
-    await ctx.reply('Thank you! Your registration is complete. You can now use /profile, /services, and /link.');
+    await new OnboardingConversation(conversation, ctx).run();
 }
+
 
 async function _embadProjectCaption(caption: string, tag: string, embadingKey: string) {
     const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/embed`, {
@@ -381,10 +436,10 @@ function profileVisibilityMenu() {
     menu.dynamic(async (ctx, range) => {
         const tgId = ctx.from?.id.toString();
         const user = await getUserByTelegramId(tgId!);
-        const proileUrl = `${process.env.NEXT_PUBLIC_APP_URL}/p/${user!.id}`;
+        const proileUrl = `${process.env.NEXT_PUBLIC_APP_URL}/talents/${user!.id}`;
 
         const label = user?.isActive ? '🔒 Make Profile Private' : '🌐 Make Profile Public';
-        range.url("🔗 Open Profile", proileUrl).row();
+        range.webApp("🔗 Open Profile", proileUrl).row()
         range.text(label, async (ctx) => {
             const tgId = ctx.from?.id.toString()!;
             const freshUser = await getUserByTelegramId(tgId); // ← re-fetch

@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['retain-sheet-blog-diet.trycloudflare.com'],
+  allowedDevOrigins: ['smile-crew-republic-yeah.trycloudflare.com'],
 };
 
 export default nextConfig;

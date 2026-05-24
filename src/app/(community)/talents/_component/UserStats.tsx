@@ -26,7 +26,7 @@ export function UserStats({ stats, githubUsername }: UserStatsProps) {
         {githubUsername && (
           <div className="mt-5 pt-4 border-t border-border">
             <p className="text-xs font-bold text-muted-foreground mb-3 text-center py-2">GitHub Contributions</p>
-            <div className="w-full overflow-x-auto">
+            <div className="w-full overflow-x-auto scrollbar-hide">
               <img
                 src={`https://ghchart.rshah.org/${githubUsername}`}
                 alt={`${githubUsername}'s GitHub contributions`}

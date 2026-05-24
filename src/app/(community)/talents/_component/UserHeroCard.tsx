@@ -111,7 +111,7 @@ export function UserHeroCard({ user }: UserHeroCardProps) {
                   </div>
                 )
               ) : (
-                "East Side Local"
+                "East Side Local Resident"
               )}
             </div>
 
