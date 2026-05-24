@@ -5,14 +5,14 @@ import {
   createConversation,
 } from '@grammyjs/conversations';
 import { NextRequest, NextResponse } from 'next/server';
-import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile,handlePodcastSuggestion } from './handlers';
+import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile, handlePodcastSuggestion } from './handlers';
 import { EDC_LINKS, PROJECT_TYPES } from '@/lib/constants';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
 
 // Define your session data shape
 interface SessionData {
-  stage?: 'projectSubmission_media' | 'projectSubmission_caption' | null;
+  stage?: 'projectSubmission' | null;
   data: {
     projectSubmitedMediaMsg?: {
       mediaGroupId?: string;
@@ -74,7 +74,7 @@ https://edc.antsar.et
 `, { parse_mode: 'Markdown' }));
 
 // /suggest
-bot.command('suggest',(ctx) => handlePodcastSuggestion(ctx));
+bot.command('suggest', (ctx) => handlePodcastSuggestion(ctx));
 
 //register conversation
 bot.use(createConversation(onboarding));
@@ -135,10 +135,10 @@ ${Object.entries(PROJECT_TYPES).map(([type, description]) =>
 `, { parse_mode: 'Markdown' });
   }
 
-  ctx.session.stage = "projectSubmission_media";
+  ctx.session.stage = "projectSubmission";
   ctx.session.data.projectSubmitedMediaMsg = { projectType: match };
   await ctx.reply(
-    `Step 1/2: 📎 *Share Your Project Media*\n\nPlease send or forward a photo or video of your project.\n\n(Type /exit to cancel)`,
+    `📎 *Share Your Project*\n\nSend or forward a photo or video of your project with a clear caption including:\n\n• GitHub link (if it's a coding project and open source\n• Live link (if it's deployed)\n• AntsarNet anonymous inbox link [net.antsar.et] for receiving anonymous feedback from users\n\n(Type /exit to cancel)`,
     { parse_mode: 'Markdown' }
   );
 });
@@ -157,10 +157,10 @@ const mediaGroupTimers = new Map<string, NodeJS.Timeout>();
 bot.on('message', async (ctx) => {
   const session = ctx.session;
 
-  if (session.stage === "projectSubmission_media") {
+  if (session.stage === "projectSubmission") {
     const isMedia = ctx.message.photo || ctx.message.video;
     if (!isMedia) {
-      return ctx.reply("Step 1/2: Please send a photo or video of your project, or type /exit to cancel.");
+      return ctx.reply("Please send a photo or video of your project, or type /exit to cancel.");
     };
 
     const mediaCaption = ctx.message.caption;
@@ -190,8 +190,7 @@ bot.on('message', async (ctx) => {
       mediaGroupTimers.set(timerKey, setTimeout(async () => {
         mediaGroupTimers.delete(timerKey);
         if (!session.data.projectSubmitedMediaMsg?.caption) {
-          session.stage = "projectSubmission_caption";
-          return ctx.reply("Step 2/2: Great! Now please send a short caption describing your project.\n\n(Type /exit to cancel)");
+          return ctx.reply("please project media you sending must include a caption \n\n(Type /exit to quit)");
         }
 
         const { caption = "", msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg;
@@ -207,8 +206,7 @@ bot.on('message', async (ctx) => {
       };
 
       if (!mediaCaption) {
-        session.stage = "projectSubmission_caption";
-        return ctx.reply("Step 2/2: Great! Now please send a short caption describing your project.\n\n(Type /exit to cancel)");
+        return ctx.reply("please project media you sending must include a caption \n\n(Type /exit to quit)");
       }
 
       const { caption = "", msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg;
@@ -216,19 +214,6 @@ bot.on('message', async (ctx) => {
       session.data = {};
       await handleProjectSubmission(ctx, msgIds, caption, projectType);
     }
-    return;
-  }
-
-  if (session.stage === "projectSubmission_caption") {
-    const caption = ctx.message.text?.trim();
-    if (!caption) {
-      return ctx.reply("Step 2/2: Please send a text caption for your project, or type /exit to cancel.");
-    }
-
-    const { msgIds = [], projectType = "" } = session.data.projectSubmitedMediaMsg || {};
-    session.stage = null;
-    session.data = {};
-    await handleProjectSubmission(ctx, msgIds, caption, projectType);
     return;
   }
 });
