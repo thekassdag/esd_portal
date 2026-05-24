@@ -84,7 +84,7 @@ export function UserProjects({ userId }: { userId: string }) {
                         {project.tag.replace(/_/g, " ")}
                       </span>
                       <a
-                        href={project.postLink}
+                        href={`https://t.me/${project.postLink}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"

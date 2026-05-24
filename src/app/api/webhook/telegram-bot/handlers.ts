@@ -1,6 +1,6 @@
 import { Context, InlineKeyboard } from 'grammy';
 import {
-    type Conversation,
+    type Conversation, ConversationFlavor
 } from '@grammyjs/conversations';
 import { db } from '@/db';
 import { departments, universities, users, userServices, socialLinks, userProjects } from '@/db/schema';
@@ -189,7 +189,7 @@ class OnboardingConversation {
     }
 
     async run(): Promise<void> {
-        let universityId,departmentId,graduationYear;
+        let universityId, departmentId, graduationYear;
         const fullName = await this.askForFullName();
         const headline = await this.askForHeadline();
         const isStudent = await this.askIsStudent();
@@ -222,6 +222,211 @@ class OnboardingConversation {
 // Entry point — same signature grammY expects for conversations
 async function onboarding(conversation: Conversation, ctx: Context) {
     await new OnboardingConversation(conversation, ctx).run();
+}
+
+// ─────────────────────────────────────────────
+// Edit Profile
+// ─────────────────────────────────────────────
+
+class EditProfileConversation {
+    private conversation: Conversation;
+    private ctx: Context;
+    private user: Awaited<ReturnType<typeof getUserByTelegramId>>;
+
+    constructor(conversation: Conversation, ctx: Context, user: Awaited<ReturnType<typeof getUserByTelegramId>>) {
+        this.conversation = conversation;
+        this.ctx = ctx;
+        this.user = user;
+    }
+
+    private async askWhatToEdit(): Promise<string | null> {
+        const kbd = new InlineKeyboard()
+            .text('📝 Full Name', 'edit_field:fullName').row()
+            .text('💬 Headline', 'edit_field:headline').row()
+            .text('📖 Bio', 'edit_field:bio').row()
+            .text('🖼️ Profile Photo', 'edit_field:photo').row()
+            .text('🎓 Academic Info', 'edit_field:academic').row()
+            .text('❌ Done', 'edit_field:done').row();
+
+        const msg = await this.ctx.reply('What would you like to edit?', { reply_markup: kbd });
+
+        const update = await this.conversation.waitForCallbackQuery(/edit_field:.*/, {
+            otherwise: ctx => ctx.reply('Please select a field to edit', { reply_parameters: { message_id: msg.message_id } })
+        });
+        await update.answerCallbackQuery();
+        await update.deleteMessage();
+        return update.callbackQuery.data.split(':')[1];
+    }
+
+    private async editFullName(): Promise<string> {
+        const msg = await this.ctx.reply(
+            `Current name: *${this.user!.fullName}*\n\nEnter your new full name:`,
+            { parse_mode: 'Markdown' }
+        );
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const name = update.message.text?.trim();
+            if (name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) return name;
+            await this.ctx.reply('Please provide first and last name, 2–50 characters.', {
+                reply_parameters: { message_id: msg.message_id }
+            });
+        }
+    }
+
+    private async editHeadline(): Promise<string> {
+        const msg = await this.ctx.reply(
+            `Current headline: *${this.user!.headline}*\n\nEnter your new headline:`,
+            { parse_mode: 'Markdown' }
+        );
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const headline = update.message.text?.trim();
+            if (headline && headline.length >= 2 && headline.length <= 50) return headline;
+            await this.ctx.reply('Please provide a headline, 2–50 characters.', {
+                reply_parameters: { message_id: msg.message_id }
+            });
+        }
+    }
+
+    private async editBio(): Promise<string> {
+        await this.ctx.reply(`Current bio:\n${this.user!.bio}\n\nEnter your new bio:`);
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const bio = update.message.text?.trim();
+            if (bio && bio.length >= 10 && bio.length <= 500) return bio;
+            await this.ctx.reply('Bio must be 10–500 characters.');
+        }
+    }
+
+    private async editPhoto(): Promise<string | null> {
+        await this.ctx.reply('Send your new profile photo, or type /skip to keep the current one.');
+        while (true) {
+            const update = await this.conversation.waitFor(['message:text', 'message:photo']);
+            if ('photo' in update.message && update.message.photo?.length) {
+                return update.message.photo.at(-1)?.file_id ?? null;
+            }
+            if (update.message.text?.trim() === '/skip') return null;
+        }
+    }
+
+    private async editUniversity(): Promise<string | null> {
+        const universityList = await db.select().from(universities).orderBy(asc(universities.name)).limit(50);
+        if (!universityList.length) {
+            await this.ctx.reply('No universities available.');
+            return null;
+        }
+        const kbd = new InlineKeyboard();
+        for (const uni of universityList) {
+            kbd.text(uni.name, `selected_uni:${uni.id}`).row();
+        }
+        const msg = await this.ctx.reply('🎓 Select your new university:', { reply_markup: kbd });
+        const update = await this.conversation.waitForCallbackQuery(/selected_uni:.*/, {
+            otherwise: ctx => ctx.reply('Please select a university', { reply_parameters: { message_id: msg.message_id } })
+        });
+        await update.answerCallbackQuery();
+        await update.deleteMessage();
+        return update.callbackQuery.data.split(':')[1];
+    }
+
+    private async editDepartment(): Promise<string | null> {
+        const departmentList = await db.select().from(departments).orderBy(asc(departments.name)).limit(50);
+        if (!departmentList.length) {
+            await this.ctx.reply('No departments available.');
+            return null;
+        }
+        const kbd = new InlineKeyboard();
+        for (const dept of departmentList) {
+            kbd.text(dept.name, `selected_dept:${dept.id}`).row();
+        }
+        const msg = await this.ctx.reply('Select your new department:', { reply_markup: kbd });
+        const update = await this.conversation.waitForCallbackQuery(/selected_dept:.*/, {
+            otherwise: ctx => ctx.reply('Please select a department', { reply_parameters: { message_id: msg.message_id } })
+        });
+        await update.answerCallbackQuery();
+        await update.deleteMessage();
+        return update.callbackQuery.data.split(':')[1];
+    }
+
+    private async editGraduationYear(): Promise<number | null> {
+        await this.ctx.reply(`Current graduation year: ${this.user!.graduationYear}\n\nEnter your new graduation year:`);
+        while (true) {
+            const update = await this.conversation.waitFor('message:text');
+            const year = Number(update.message.text?.trim());
+            if (!Number.isNaN(year) && year >= 1900 && year <= 2100) return year;
+            await this.ctx.reply('Please enter a valid year, e.g. 2025.');
+        }
+    }
+
+    private async editAcademicInfo(): Promise<{ universityId: string; departmentId: string; graduationYear: number } | null> {
+        await this.ctx.reply('📚 Let\'s update your academic info. All three fields (university, department, graduation year) must be filled.');
+
+        const universityId = await this.editUniversity();
+        if (!universityId) return null;
+
+        const departmentId = await this.editDepartment();
+        if (!departmentId) return null;
+
+        const graduationYear = await this.editGraduationYear();
+        if (!graduationYear) return null;
+
+        return { universityId, departmentId, graduationYear };
+    }
+
+    async run(): Promise<void> {
+        if (!this.user) {
+            await this.ctx.reply('You are not registered yet. Use /start to register.');
+            return;
+        }
+
+        while (true) {
+            const field = await this.askWhatToEdit();
+            if (!field || field === 'done') break;
+
+            const updates: Partial<typeof users.$inferInsert> = {};
+
+            switch (field) {
+                case 'fullName':
+                    updates.fullName = await this.editFullName();
+                    break;
+                case 'headline':
+                    updates.headline = await this.editHeadline();
+                    break;
+                case 'bio':
+                    updates.bio = await this.editBio();
+                    break;
+                case 'photo': {
+                    const newPhoto = await this.editPhoto();
+                    if (newPhoto) updates.profileImageId = newPhoto;
+                    break;
+                }
+                case 'academic': {
+                    const academic = await this.editAcademicInfo();
+                    if (academic) {
+                        updates.universityId = academic.universityId;
+                        updates.departmentId = academic.departmentId;
+                        updates.graduationYear = academic.graduationYear;
+                    }
+                    break;
+                }
+            }
+
+            if (Object.keys(updates).length) {
+                await db.update(users)
+                    .set(updates)
+                    .where(eq(users.telegramId, this.ctx.from!.id.toString()));
+                this.user = { ...this.user!, ...updates };
+                await this.ctx.reply('✅ Updated! Want to edit anything else?');
+            }
+        }
+
+        await this.ctx.reply('✅ Profile update complete!');
+    }
+}
+
+// Entry point
+async function editProfile(conversation: Conversation, ctx: Context) {
+    const user = await getUserByTelegramId(ctx.from!.id.toString());
+    await new EditProfileConversation(conversation, ctx, user).run();
 }
 
 
@@ -276,8 +481,8 @@ async function handleProjectSubmission(ctx: Context, msgIds: number[], caption: 
             .text('✅ Accept', `pro_review:${ctx.from?.id}/${firstMsg}:${msgIds.length}/accept`)
             .text('❌ Reject', `pro_review:${ctx.from?.id}/${firstMsg}:${msgIds.length}/reject`);
 
-        await ctx.api.sendMessage(EDC_ADMIN_GROUP_ID, 'Review this project:', {
-            message_thread_id: 2,
+        await ctx.api.sendMessage(EDC_ADMIN_GROUP_ID, `Review this #${projectType} project:`, {
+            message_thread_id: EDC_ADMIN_GROUP_PROJECT_TOPIC_ID,
             reply_markup: reviewKbd,
             reply_parameters: {
                 message_id: sent[0].message_id
@@ -301,14 +506,15 @@ async function handleProjectReview(ctx: Context) {
     // answer immediately before doing anything else, ignore if expired
     await ctx.answerCallbackQuery().catch(() => { });
     try {
-
-
-
         const [, userId, firstMsgId, count, action] = ctx.match as string[];
+        const msg = ctx.callbackQuery?.message;
+        const tagEntity = msg?.entities?.find((entity) => entity.type === 'hashtag');
+        if(!tagEntity) return;
+        const tag = msg?.text?.slice(tagEntity.offset+1, tagEntity.offset + tagEntity.length);
+        if(!tag) return;
+
         const msgIds = Array.from({ length: Number(count) }, (_, i) => Number(firstMsgId) + i);
         const embeddingKey = `${EDC_ADMIN_GROUP_ID}/${EDC_ADMIN_GROUP_PROJECT_TOPIC_ID}/${firstMsgId}`;
-
-
 
         const btnText = action === 'accept' ? '✅ Accepted' : '❌ Rejected';
         const reviewStatusMarkup = {
@@ -330,11 +536,12 @@ async function handleProjectReview(ctx: Context) {
             const msg = await ctx.api.copyMessages(EDC_CHANNEL_USERNAME, userId, msgIds);
             await db.insert(userProjects).values({
                 userId: user.id,
-                postLink: `https://t.me/${EDC_CHANNEL_USERNAME}/${msg[0].message_id}`,
-                embeddingKey: embeddingKey,
+                postLink: `/${EDC_CHANNEL_USERNAME.replace("@","")}/${msg[0].message_id}`,
+                embeddingKey,
+                tag,
                 status: 'active'
             });
-            const profileLink = `${process.env.NEXT_PUBLIC_APP_URL}/p/${user.id}`;
+            const profileLink = `${process.env.NEXT_PUBLIC_APP_URL}/talents/${user.id}`;
             await ctx.api.sendMessage(EDC_CHANNEL_USERNAME, `#Project Submited by: [${user.fullName}](${profileLink})`, { parse_mode: 'Markdown', reply_parameters: { message_id: msg[0].message_id } });
         }
 
@@ -399,7 +606,7 @@ function serviceMenu() {
 async function linkSocialAccount(ctx: Context) {
     let [platform, username] = String(ctx.match || '').split('@') || [];
     if (!platform || !username) {
-        await ctx.reply('Usage: /link platform@username\nExample: /link github@johndoe');
+        await ctx.reply('Usage: /link platform@username\nExample: /link github@johndoe\nAvailable platforms: ' + Object.keys(PLATFORMS).join(', '));
         return;
     }
 
@@ -432,14 +639,17 @@ async function linkSocialAccount(ctx: Context) {
 }
 
 function profileVisibilityMenu() {
-    const menu = new Menu<Context>('profile-visibility-menu');
-    menu.dynamic(async (ctx, range) => {
+    const menu = new Menu<ConversationFlavor<Context>>('profile-visibility-menu');
+    menu.dynamic(async (ctx: Context, range) => {
         const tgId = ctx.from?.id.toString();
         const user = await getUserByTelegramId(tgId!);
         const proileUrl = `${process.env.NEXT_PUBLIC_APP_URL}/talents/${user!.id}`;
 
         const label = user?.isActive ? '🔒 Make Profile Private' : '🌐 Make Profile Public';
         range.webApp("🔗 Open Profile", proileUrl).row()
+        range.text("✏️ Edit Profile", async (ctx) => {
+            await ctx.conversation.enter('editProfile');
+        }).row()
         range.text(label, async (ctx) => {
             const tgId = ctx.from?.id.toString()!;
             const freshUser = await getUserByTelegramId(tgId); // ← re-fetch
@@ -454,4 +664,4 @@ function profileVisibilityMenu() {
 }
 
 
-export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview };
+export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile };

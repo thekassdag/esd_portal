@@ -5,7 +5,7 @@ import {
   createConversation,
 } from '@grammyjs/conversations';
 import { NextRequest, NextResponse } from 'next/server';
-import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview } from './handlers';
+import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile } from './handlers';
 import { EDC_LINKS, PROJECT_TYPES } from '@/lib/constants';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
@@ -42,24 +42,47 @@ bot.use(async (ctx, next) => {
   }
 
   const user = await getUserByTelegramId(ctx.from?.id.toString() || '');
-  if (!user && ['/profile', '/services', '/link', '/submit'].includes(ctx.message?.text?.split(' ')[0] || '')) {
+  if (!user && ['/profile', '/service', '/link', '/submit'].includes(ctx.message?.text?.split(' ')[0] || '')) {
     return ctx.reply('Please register first to use this bot. Use /register to get started');
   }
   await next();
 });
 
 // /start
-bot.command('start', (ctx) => ctx.reply('Welcome! The bot is now running.'));
+bot.command('start', (ctx) => ctx.reply(`👋 Welcome to *East Devs Community Bot!*
+
+This bot helps you manage your profile, services, and project submissions on E-DC Community platform
+https://edc.antsar.et
+
+*Getting Started*
+/register — Create your profile
+
+*👤 Profile*
+/profile — View & manage your profile
+/service — Select services you offer
+/link — Link a social account
+
+*📁 Projects*
+/submit — Submit a project to showcase on your profile
+
+*🌐 Community*
+/contact — Get our social media links
+
+*❌ Other*
+/exit — Exit current conversation or session
+`, { parse_mode: 'Markdown' }));
 
 
 //register conversation
 bot.use(createConversation(onboarding));
 bot.command('register', async (ctx) => await ctx.conversation.enter('onboarding'));
 
+// edit profile conversation
+bot.use(createConversation(editProfile));
 
-// /services
+// /service
 bot.use(serviceMenu());
-bot.command("services", async (ctx) => {
+bot.command("service", async (ctx) => {
   await ctx.reply('Select your services:', { reply_markup: serviceMenu() });
 });
 
@@ -95,10 +118,6 @@ bot.command('exit', async (ctx) => {
 
 
 // submit projects
-// /project 
-// they send us media group with caption or forward to us
-// and we will foraward to our group with [[accept], [reject]] inline buttons
-// bot.use(createConversation(handleProjectSubmission));
 bot.command('submit', async (ctx) => {
   const match = ctx.match
   if (!Object.keys(PROJECT_TYPES).includes(match)) {
@@ -120,7 +139,7 @@ ${Object.entries(PROJECT_TYPES).map(([type, description]) =>
     { parse_mode: 'Markdown' }
   );
 });
-
+// handle project review
 bot.callbackQuery(/^pro_review:(\d+)\/(\d+):(\d+)\/(accept|reject)$/, (ctx) => handleProjectReview(ctx));
 
 
@@ -130,6 +149,7 @@ bot.callbackQuery('noop', async (ctx) => {
 });
 
 
+// handle media group
 const mediaGroupTimers = new Map<string, NodeJS.Timeout>();
 bot.on('message', async (ctx) => {
   const session = ctx.session;
