@@ -48,7 +48,7 @@ export default async function Page({ params }: Props) {
   const { userId } = await params;
   const data = await getUserDetailsById(userId);
 
-  if (!data || !data.telegramId) {
+  if (!data || !data.telegramId || !data.isActive) {
     notFound();
   }
 
