@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  allowedDevOrigins: ['smile-crew-republic-yeah.trycloudflare.com'],
+  allowedDevOrigins: ['localhost:3001'],
+  // allowedDevOrigins: ['edc.antsar.et'],
 };
 
 export default nextConfig;

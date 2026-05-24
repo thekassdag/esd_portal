@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { PodcastsPage } from "./_component/PodcastsPage";
+import { Suspense } from "react";
 
 export function generateMetadata(): Metadata {
   return {
@@ -10,5 +11,9 @@ export function generateMetadata(): Metadata {
 }
 
 export default function Page() {
-  return <PodcastsPage />;
+  return (
+    <Suspense fallback={<div>Loading podcasts...</div>}>
+      <PodcastsPage />
+    </Suspense>
+  );
 }

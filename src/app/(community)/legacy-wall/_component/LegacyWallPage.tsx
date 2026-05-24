@@ -52,12 +52,6 @@ export function LegacyWallPage() {
 
   return (
     <div className="mt-8 w-full max-w-6xl mx-auto pb-20">
-      <div className="mb-12">
-        <p className="text-muted-foreground text-sm">
-          Digital Legacy Wall of E-DC, tracing all events, contributions, and achievements of our community that have happened since the beginning
-        </p>
-      </div>
-
       <div className="timeline-container">
         <VerticalTimeline lineColor="hsl(var(--border))" animate={true}>
           {events.map((event, index) => {

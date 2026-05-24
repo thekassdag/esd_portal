@@ -8,7 +8,7 @@ import { faCircleDollarToSlot } from "@fortawesome/free-solid-svg-icons";
 import GurshaButton from "./GurshaButton";
 
 
-export default function Navbar() {
+export default function Navbar({ subs }: { subs: number | string }) {
   const pathname = usePathname();
   const isTalentPage = pathname !== "/talents" && pathname.startsWith("/talents/");
 
@@ -28,7 +28,7 @@ export default function Navbar() {
             Join Us
           </a>
           <span className="text-sm text-muted-foreground">•</span>
-          <span className="text-sm text-muted-foreground">2.5k Sub</span>
+          <span className="text-sm text-muted-foreground">{subs} Members</span>
         </div>
       </div>
     </div>

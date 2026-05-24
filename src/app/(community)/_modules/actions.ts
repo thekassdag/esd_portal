@@ -4,8 +4,18 @@ import { db } from "@/db";
 import { userProjects } from "@/db/schema";
 import { and, desc, eq, inArray } from "drizzle-orm";
 import { EmbeddingResult } from "./types";
+import bot from "@/lib/telegram-bot";
+import { formatCount } from "@/lib/utils";
 
-
+export async function getSubs() {
+  try {
+    const subs = await bot.api.getChatMemberCount(process.env.EDC_CHANNEL_USERNAME!)
+    return formatCount(subs);
+  } catch (error) {
+    console.error("Error getting subscriptions:", error);
+    return "**.*";
+  }
+}
 
 async function searchEmbeddings(
   query: string,
