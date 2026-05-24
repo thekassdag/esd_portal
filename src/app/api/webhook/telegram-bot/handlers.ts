@@ -227,7 +227,6 @@ async function onboarding(conversation: Conversation, ctx: Context) {
 // ─────────────────────────────────────────────
 // Edit Profile
 // ─────────────────────────────────────────────
-
 class EditProfileConversation {
     private conversation: Conversation;
     private ctx: Context;
@@ -552,6 +551,42 @@ async function handleProjectReview(ctx: Context) {
     }
 }
 
+async function handlePodcastSuggestion(ctx: Context) {
+    const match = ctx.match?.toString().trim();
+
+    if (!match) {
+        await ctx.reply(
+            'Please send: /suggest <guest LinkedIn/X(Twitter) profile link>'
+        );
+        return;
+    }
+
+    // LinkedIn profile or X/Twitter profile URL
+    const profileRegex =
+        /^https?:\/\/(www\.)?(linkedin\.com\/in\/[a-zA-Z0-9-_%]+|(x\.com|twitter\.com)\/[a-zA-Z0-9_]+)\/?$/i;
+
+    if (!profileRegex.test(match)) {
+        await ctx.reply(
+            'Please provide a valid LinkedIn or X(Twitter) profile link.'
+        );
+        return;
+    }
+
+    await ctx.api.sendMessage(
+        EDC_ADMIN_GROUP_ID,
+        `🎙 Podcast suggestion:\n${match}`,
+        {
+            message_thread_id: Number(
+                process.env.EDC_ADMIN_GROUP_PODCAST_SUGGESTION_TOPIC_ID!
+            ),
+        }
+    );
+
+    await ctx.reply(
+        'Thank you for your suggestion. Our team will review it.'
+    );
+}
+
 function serviceMenu() {
     const menu = new Menu<Context>('service-menu')
         .dynamic(async (ctx, range) => {
@@ -664,4 +699,4 @@ function profileVisibilityMenu() {
 }
 
 
-export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile };
+export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile,handlePodcastSuggestion };

@@ -5,7 +5,7 @@ import {
   createConversation,
 } from '@grammyjs/conversations';
 import { NextRequest, NextResponse } from 'next/server';
-import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile } from './handlers';
+import { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile,handlePodcastSuggestion } from './handlers';
 import { EDC_LINKS, PROJECT_TYPES } from '@/lib/constants';
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN!;
@@ -66,12 +66,15 @@ https://edc.antsar.et
 /submit — Submit a project to showcase on your profile
 
 *🌐 Community*
-/contact — Get our social media links
+/contact — Get our donation and social media links
+/suggest — Suggest a podcast guest
 
 *❌ Other*
 /exit — Exit current conversation or session
 `, { parse_mode: 'Markdown' }));
 
+// /suggest
+bot.command('suggest',(ctx) => handlePodcastSuggestion(ctx));
 
 //register conversation
 bot.use(createConversation(onboarding));

@@ -51,9 +51,10 @@ export const PROJECT_TYPES: Record<string, string> = {
 
 
 export const EDC_LINKS: Record<string, string> = {
-  GitHub: 'https://github.com/east_devs_community',
-  LinkedIn: 'https://linkedin.com/in/east_devs_community',
+  GitHub: 'https://github.com/east-devs-community',
+  // LinkedIn: 'https://linkedin.com/in/east_devs_community',
   TikTok: 'https://tiktok.com/@east_devs_community',
-  Donate: 'https://gurshaplus.com/eastdevs',
+  Donate: 'https://gurshaplus.com/edc_donate',
+  Email: 'https://mail.google.com/mail/?view=cm&fs=1&to=mail@edc.antsar.et',
   DM: 'https://t.me/east_devs_community?direct'
 };
