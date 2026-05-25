@@ -10,8 +10,6 @@ export const socialLinks = mysqlTable("social_links", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
 },
-(table) => ({
-  pk: primaryKey({
-    columns: [table.userId, table.platform],
-  })
-}));
+(table) => [    // <-- array instead of object
+  primaryKey({ columns: [table.userId, table.platform] })
+]);

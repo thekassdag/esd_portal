@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     description: 'Find and hire top talent.',
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function RootLayout({
     children,
 }: {

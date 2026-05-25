@@ -14,6 +14,7 @@ dist-ssr
 
 # seed
 src/db/seed.ts
+data.sql
 
 # Editor directories and files
 .vscode/*
