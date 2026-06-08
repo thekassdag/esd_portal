@@ -45,7 +45,7 @@ export default function Navbar({ subs }: { subs: number | string }) {
       {!isTalentPage && (
         <GurshaButton
           label="Dontate"
-          creator={process.env.EDC_GURSHAPLUS}
+          creator={process.env.EDC_GURSHAPLUS!}
         />
       )}
     </nav>
