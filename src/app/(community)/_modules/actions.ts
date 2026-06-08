@@ -9,8 +9,8 @@ export async function getSubs() {
   try {
     const subs = await bot.api.getChatMemberCount(process.env.EDC_CHANNEL_USERNAME!)
     return formatCount(subs);
-  } catch (error) {
-    console.error("Error getting subscriptions:", error);
+  } catch {
+    // silently ignore
     return "**.*";
   }
 }
@@ -95,12 +95,12 @@ export async function getProjects(
       where: whereClause,
       orderBy: { createdAt: 'desc' },
       ...(isSemantic ? {} : { take: limit + 1, skip: offset }),
-      select: { 
+      select: {
         id: true,
-        postLink: true, 
-        tag: true, 
-        embeddingKey: true, 
-        user: userId ? false : true 
+        postLink: true,
+        tag: true,
+        embeddingKey: true,
+        user: userId ? false : true
       },
     });
 
