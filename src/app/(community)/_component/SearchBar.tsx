@@ -1,9 +1,11 @@
 "use client"
 import { Input } from "@/components/ui/input";
 import { Search, TriangleAlert } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useTransition } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useUpdateQuery } from "@/hooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
 
 const SearchBar = () => {
@@ -13,8 +15,9 @@ const SearchBar = () => {
     const warnTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     const pathname = usePathname();
     const updateQuery = useUpdateQuery();
+    const [isPending, startTransition] = useTransition();
 
-    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const raw = e.target.value;
         // Allow: ASCII printable chars (a-z, A-Z, 0-9, spaces, symbols)
         // Block: any non-ASCII character (Arabic, Amharic, Chinese, etc.)
@@ -29,16 +32,34 @@ const SearchBar = () => {
         }
 
         setQuery(sanitized);
-        updateQuery({ q: sanitized });
+
+        // Immediately reset results when user clears the input
+        if (sanitized === "") {
+            startTransition(() => {
+                updateQuery({ q: null });
+            });
+        }
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            startTransition(() => {
+                updateQuery({ q: query });
+            });
+        }
     };
 
     return (
         <div className="mb-5 animate-fade-in stagger-1">
             <div className="frosted-input rounded-xl flex items-center gap-3 px-4 py-2 shadow-sm">
-                <Search size={16} className="text-muted-foreground flex-shrink-0" />
+                {isPending
+                    ? <FontAwesomeIcon icon={faCircleNotch} className="w-4 h-4 animate-spin text-primary flex-shrink-0" />
+                    : <Search size={16} className="text-muted-foreground flex-shrink-0" />
+                }
                 <Input
                     value={query}
-                    onChange={handleSearch}
+                    onChange={handleChange}
+                    onKeyDown={handleKeyDown}
                     lang="en"
                     className="flex-1 bg-transparent border-none text-sm text-foreground outline-none ring-0 focus-visible:ring-0 placeholder-muted-foreground h-8"
                     placeholder={
