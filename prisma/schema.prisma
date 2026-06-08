@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+
+datasource db {
+  provider = "mysql"
+}
+
+model University {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String   @db.VarChar(255)
+  shortName String?  @map("short_name") @db.VarChar(50)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("universities")
+}
+
+model Department {
+  id        String   @id @default(uuid()) @db.VarChar(36)
+  name      String   @db.VarChar(255)
+  code      String?  @db.VarChar(50)
+  years     Int?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users User[]
+
+  @@map("departments")
+}
+
+model User {
+  id             String      @id @default(uuid()) @db.VarChar(36)
+  fullName       String      @map("full_name") @db.VarChar(255)
+  headline       String?     @db.VarChar(50)
+  telegramId     String?     @unique @map("telegram_id") @db.VarChar(255)
+  bio            String?     @db.Text
+  profileImageId String?     @map("profile_image_id") @db.VarChar(255)
+  universityId   String?     @map("university_id") @db.VarChar(36)
+  departmentId   String?     @map("department_id") @db.VarChar(36)
+  graduationYear Int?        @map("graduation_year")
+  isActive       Boolean     @default(false) @map("is_active")
+  isTeamMember   Boolean     @default(false) @map("is_team_member")
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  university   University?  @relation(fields: [universityId], references: [id], onDelete: SetNull)
+  department   Department?  @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+  socialLinks  SocialLink[]
+  services     UserService[]
+  projects     UserProject[]
+
+  @@map("users")
+}
+
+model SocialLink {
+  userId    String   @map("user_id") @db.VarChar(36)
+  platform  String   @db.VarChar(50)
+  username  String?  @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, platform])
+  @@map("social_links")
+}
+
+model Service {
+  id          String   @id @default(uuid()) @db.VarChar(36)
+  name        String   @db.VarChar(255)
+  description String?  @db.VarChar(500)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users UserService[]
+
+  @@map("services")
+}
+
+model UserService {
+  userId    String   @map("user_id") @db.VarChar(36)
+  serviceId String   @map("service_id") @db.VarChar(36)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, serviceId])
+  @@map("user_services")
+}
+
+enum ProjectStatus {
+  active
+  inactive
+  flaged
+}
+
+model UserProject {
+  id           String        @id @default(uuid()) @db.VarChar(36)
+  userId       String        @map("user_id") @db.VarChar(36)
+  postLink     String        @unique @map("post_link") @db.VarChar(255)
+  embeddingKey String        @unique @map("embedding_key") @db.VarChar(255)
+  tag          String        @db.VarChar(50)
+  status       ProjectStatus @default(active)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_projects")
+}
+
+model LegacyWall {
+  id           String   @id @default(uuid()) @db.VarChar(36)
+  title        String   @db.VarChar(255)
+  description  String   @db.Text
+  eventDate    DateTime @map("event_date")
+  contributors Json
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("legacy_wall")
+}
+
+model Podcast {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  ses        Int
+  eps        Int
+  postLink   String   @unique @map("post_link") @db.VarChar(255)
+  audioLink  String?  @unique @map("audio_link") @db.VarChar(255)
+  guest      String   @db.VarChar(255)
+  streamDate DateTime @map("stream_date") @db.Date
+
+  @@map("podcasts")
+}

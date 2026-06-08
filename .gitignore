@@ -13,8 +13,7 @@ dist-ssr
 *.local
 
 # seed
-src/db/seed.ts
-data.sql
+prisma/seed.ts
 
 # Editor directories and files
 .vscode/*
@@ -31,3 +30,4 @@ docs
 .env
 drizzle
 deploy.sh
+/src/generated/prisma

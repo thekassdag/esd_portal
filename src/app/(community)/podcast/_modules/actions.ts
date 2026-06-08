@@ -1,8 +1,6 @@
 "use server";
 
-import { db } from "@/db";
-import { podcasts } from "@/db/schema";
-import { and, desc, like } from "drizzle-orm";
+import prisma from "@/lib/prisma";
 
 export async function getPodcasts(
   query?: string,
@@ -10,24 +8,21 @@ export async function getPodcasts(
   limit: number = 10
 ) {
   try {
-    const conditions = [];
     const offset = (page - 1) * limit;
-    let hasNextPage = false;
-
+    
+    const whereClause: any = {};
     if (query) {
-      conditions.push(like(podcasts.guest, `%${query}%`));
+      whereClause.guest = { contains: query };
     }
 
-    const queryConfig: any = {
-      where: conditions.length ? and(...conditions) : undefined,
-      orderBy: [desc(podcasts.streamDate)],
-      limit: limit + 1,
-      offset,
-    };
+    const podcastResults = await prisma.podcast.findMany({
+      where: whereClause,
+      orderBy: { streamDate: 'desc' },
+      take: limit + 1,
+      skip: offset,
+    });
 
-    const podcastResults = await db.query.podcasts.findMany(queryConfig);
-
-    hasNextPage = podcastResults.length > limit;
+    let hasNextPage = podcastResults.length > limit;
 
     if (hasNextPage) {
       podcastResults.pop();

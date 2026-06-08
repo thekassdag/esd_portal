@@ -1,8 +1,6 @@
 "use server";
 
-import { db } from "@/db";
-import { legacyWall } from "@/db/schema";
-import { desc } from "drizzle-orm";
+import prisma from "@/lib/prisma";
 
 export async function getLegacyEvents(
   page: number = 1,
@@ -10,17 +8,14 @@ export async function getLegacyEvents(
 ) {
   try {
     const offset = (page - 1) * limit;
-    let hasNextPage = false;
 
-    const queryConfig: any = {
-      orderBy: [desc(legacyWall.eventDate)],
-      limit: limit + 1,
-      offset,
-    };
+    const events = await prisma.legacyWall.findMany({
+      orderBy: { eventDate: 'desc' },
+      take: limit + 1,
+      skip: offset,
+    });
 
-    const events = await db.query.legacyWall.findMany(queryConfig);
-
-    hasNextPage = events.length > limit;
+    let hasNextPage = events.length > limit;
 
     if (hasNextPage) {
       events.pop();

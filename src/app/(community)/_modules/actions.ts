@@ -1,8 +1,6 @@
 "use server";
 
-import { db } from "@/db";
-import { userProjects } from "@/db/schema";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import prisma from "@/lib/prisma";
 import { EmbeddingResult } from "./types";
 import bot from "@/lib/telegram-bot";
 import { formatCount } from "@/lib/utils";
@@ -54,9 +52,10 @@ export async function getProjects(
   limit: number = 10
 ) {
   try {
-    const conditions = [
-      eq(userProjects.status, "active")
-    ];
+    const whereClause: any = {
+      status: "active"
+    };
+
     let embeddingKeys: string[] = [];
     let scoreMap: Map<string, number> = new Map();
 
@@ -65,11 +64,6 @@ export async function getProjects(
 
     const isSemantic = query && tag;
 
-    /**
-     * ======================
-     * SEMANTIC SEARCH MODE
-     * ======================
-     */
     if (isSemantic) {
       const matches = await searchEmbeddings(query, tag, page, limit);
 
@@ -82,49 +76,34 @@ export async function getProjects(
       }
 
       embeddingKeys = matches.map((m) => m.id);
-      // score lookup: embeddingKey -> similarity score
       scoreMap = new Map(matches.map((m) => [m.id, m.score]));
 
-      conditions.push(inArray(userProjects.embeddingKey, embeddingKeys));
+      whereClause.embeddingKey = { in: embeddingKeys };
 
       hasNextPage = matches.length === limit;
     }
 
-    /**
-     * ======================
-     * NORMAL CONDITIONS
-     * ======================
-     */
     if (userId) {
-      conditions.push(eq(userProjects.userId, userId));
+      whereClause.userId = userId;
     }
 
     if (tag && embeddingKeys.length === 0) {
-      conditions.push(eq(userProjects.tag, tag));
+      whereClause.tag = tag;
     }
 
-    /**
-     * ======================
-     * DB QUERY CONFIG
-     * ======================
-     */
-    const queryConfig: any = {
-      where: conditions.length ? and(...conditions) : undefined,
-      orderBy: [desc(userProjects.createdAt)],
-      ...(isSemantic ? {} : { limit: limit + 1, offset }),
-      ...(userId ? {} : { with: { user: true } }), //include me the user details if userId is not provided cuz if not userId provided we dont know them if we know we dont need to refetch
-    };
-
-    const projects = await db.query.userProjects.findMany({
-      ...queryConfig,
-      columns: { postLink: true, tag: true, embeddingKey: true, user: userId ? false : true },
+    const projects = await prisma.userProject.findMany({
+      where: whereClause,
+      orderBy: { createdAt: 'desc' },
+      ...(isSemantic ? {} : { take: limit + 1, skip: offset }),
+      select: { 
+        id: true,
+        postLink: true, 
+        tag: true, 
+        embeddingKey: true, 
+        user: userId ? false : true 
+      },
     });
 
-    /**
-     * ======================
-     * NORMAL PAGINATION LOGIC
-     * ======================
-     */
     if (!isSemantic) {
       hasNextPage = projects.length > limit;
 
@@ -145,8 +124,8 @@ export async function getProjects(
 }
 
 export async function fetchServices() {
-  const services = await db.query.services.findMany({
-    columns: {
+  const services = await prisma.service.findMany({
+    select: {
       id: true,
       name: true,
       description: true,

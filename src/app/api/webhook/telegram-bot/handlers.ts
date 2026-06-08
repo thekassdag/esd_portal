@@ -3,20 +3,16 @@ import {
     type Conversation, ConversationFlavor
 } from '@grammyjs/conversations';
 import { db } from '@/db';
-import { departments, universities, users, userServices, socialLinks, userProjects } from '@/db/schema';
-import { asc, eq, and } from 'drizzle-orm';
 import { Menu } from '@grammyjs/menu';
 import { PLATFORMS } from '@/lib/constants';
-
 
 const EDC_ADMIN_GROUP_ID = process.env.EDC_ADMIN_GROUP_ID!;
 const EDC_CHANNEL_USERNAME = process.env.EDC_CHANNEL_USERNAME!;
 const EDC_ADMIN_GROUP_PROJECT_TOPIC_ID = parseInt(process.env.EDC_ADMIN_GROUP_PROJECT_TOPIC_ID!);
 
-
 async function getUserByTelegramId(telegramId: string) {
-    const user = await db.query.users.findFirst({
-        where: eq(users.telegramId, telegramId),
+    const user = await db.user.findUnique({
+        where: { telegramId },
     });
     return user;
 }
@@ -35,7 +31,7 @@ class OnboardingConversation {
         while (true) {
             const update = await this.conversation.waitFor('message:text');
             const name = update.message.text?.trim();
-            if (name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) {
+            if (name && name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) {
                 return name;
             }
             await this.ctx.reply(
@@ -84,11 +80,10 @@ class OnboardingConversation {
     }
 
     private async askForUniversity(): Promise<string | null> {
-        const universityList = await db
-            .select()
-            .from(universities)
-            .orderBy(asc(universities.name))
-            .limit(50);
+        const universityList = await db.university.findMany({
+            orderBy: { name: 'asc' },
+            take: 50,
+        });
 
         if (!universityList.length) {
             await this.ctx.reply('Sorry, no universities are available in the system right now.');
@@ -113,11 +108,10 @@ class OnboardingConversation {
     }
 
     private async askForDepartment(): Promise<string | null> {
-        const departmentList = await db
-            .select()
-            .from(departments)
-            .orderBy(asc(departments.name))
-            .limit(50);
+        const departmentList = await db.department.findMany({
+            orderBy: { name: 'asc' },
+            take: 50,
+        });
 
         if (!departmentList.length) {
             await this.ctx.reply('Sorry, no departments are available in the system right now.');
@@ -189,7 +183,9 @@ class OnboardingConversation {
     }
 
     async run(): Promise<void> {
-        let universityId, departmentId, graduationYear;
+        let universityId: string | null = null;
+        let departmentId: string | null = null;
+        let graduationYear: number | null = null;
         const fullName = await this.askForFullName();
         const headline = await this.askForHeadline();
         const isStudent = await this.askIsStudent();
@@ -201,38 +197,36 @@ class OnboardingConversation {
         }
 
         const bio = await this.askForBio();
-        const profileImageId = await this.askForProfileImage();
+        const profileImageId = await this.askForProfileImage() || null;
 
-        await db.insert(users).values({
-            fullName,
-            telegramId: this.ctx.from?.id.toString(),
-            headline,
-            bio,
-            universityId,
-            departmentId,
-            graduationYear,
-            profileImageId,
-            isActive: true
+        await db.user.create({
+            data: {
+                fullName,
+                telegramId: this.ctx.from?.id.toString(),
+                headline,
+                bio,
+                universityId,
+                departmentId,
+                graduationYear,
+                profileImageId,
+                isActive: true
+            }
         });
 
         await this.ctx.reply('Thank you! Your registration is complete. You can now use /profile, /services, and /link.');
     }
 }
 
-// Entry point — same signature grammY expects for conversations
 async function onboarding(conversation: Conversation, ctx: Context) {
     await new OnboardingConversation(conversation, ctx).run();
 }
 
-// ─────────────────────────────────────────────
-// Edit Profile
-// ─────────────────────────────────────────────
 class EditProfileConversation {
     private conversation: Conversation;
     private ctx: Context;
-    private user: Awaited<ReturnType<typeof getUserByTelegramId>>;
+    private user: NonNullable<Awaited<ReturnType<typeof getUserByTelegramId>>>;
 
-    constructor(conversation: Conversation, ctx: Context, user: Awaited<ReturnType<typeof getUserByTelegramId>>) {
+    constructor(conversation: Conversation, ctx: Context, user: NonNullable<Awaited<ReturnType<typeof getUserByTelegramId>>>) {
         this.conversation = conversation;
         this.ctx = ctx;
         this.user = user;
@@ -259,13 +253,13 @@ class EditProfileConversation {
 
     private async editFullName(): Promise<string> {
         const msg = await this.ctx.reply(
-            `Current name: *${this.user!.fullName}*\n\nEnter your new full name:`,
+            `Current name: *${this.user.fullName}*\n\nEnter your new full name:`,
             { parse_mode: 'Markdown' }
         );
         while (true) {
             const update = await this.conversation.waitFor('message:text');
             const name = update.message.text?.trim();
-            if (name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) return name;
+            if (name && name.split(' ').length >= 2 && name.length >= 2 && name.length <= 50) return name;
             await this.ctx.reply('Please provide first and last name, 2–50 characters.', {
                 reply_parameters: { message_id: msg.message_id }
             });
@@ -274,7 +268,7 @@ class EditProfileConversation {
 
     private async editHeadline(): Promise<string> {
         const msg = await this.ctx.reply(
-            `Current headline: *${this.user!.headline}*\n\nEnter your new headline:`,
+            `Current headline: *${this.user.headline}*\n\nEnter your new headline:`,
             { parse_mode: 'Markdown' }
         );
         while (true) {
@@ -288,7 +282,7 @@ class EditProfileConversation {
     }
 
     private async editBio(): Promise<string> {
-        await this.ctx.reply(`Current bio:\n${this.user!.bio}\n\nEnter your new bio:`);
+        await this.ctx.reply(`Current bio:\n${this.user.bio}\n\nEnter your new bio:`);
         while (true) {
             const update = await this.conversation.waitFor('message:text');
             const bio = update.message.text?.trim();
@@ -309,7 +303,7 @@ class EditProfileConversation {
     }
 
     private async editUniversity(): Promise<string | null> {
-        const universityList = await db.select().from(universities).orderBy(asc(universities.name)).limit(50);
+        const universityList = await db.university.findMany({ orderBy: { name: 'asc' }, take: 50 });
         if (!universityList.length) {
             await this.ctx.reply('No universities available.');
             return null;
@@ -328,7 +322,7 @@ class EditProfileConversation {
     }
 
     private async editDepartment(): Promise<string | null> {
-        const departmentList = await db.select().from(departments).orderBy(asc(departments.name)).limit(50);
+        const departmentList = await db.department.findMany({ orderBy: { name: 'asc' }, take: 50 });
         if (!departmentList.length) {
             await this.ctx.reply('No departments available.');
             return null;
@@ -347,7 +341,7 @@ class EditProfileConversation {
     }
 
     private async editGraduationYear(): Promise<number | null> {
-        await this.ctx.reply(`Current graduation year: ${this.user!.graduationYear}\n\nEnter your new graduation year:`);
+        await this.ctx.reply(`Current graduation year: ${this.user.graduationYear}\n\nEnter your new graduation year:`);
         while (true) {
             const update = await this.conversation.waitFor('message:text');
             const year = Number(update.message.text?.trim());
@@ -372,16 +366,11 @@ class EditProfileConversation {
     }
 
     async run(): Promise<void> {
-        if (!this.user) {
-            await this.ctx.reply('You are not registered yet. Use /start to register.');
-            return;
-        }
-
         while (true) {
             const field = await this.askWhatToEdit();
             if (!field || field === 'done') break;
 
-            const updates: Partial<typeof users.$inferInsert> = {};
+            const updates: any = {};
 
             switch (field) {
                 case 'fullName':
@@ -410,10 +399,11 @@ class EditProfileConversation {
             }
 
             if (Object.keys(updates).length) {
-                await db.update(users)
-                    .set(updates)
-                    .where(eq(users.telegramId, this.ctx.from!.id.toString()));
-                this.user = { ...this.user!, ...updates };
+                await db.user.update({
+                    where: { telegramId: this.ctx.from!.id.toString() },
+                    data: updates
+                });
+                this.user = { ...this.user, ...updates };
                 await this.ctx.reply('✅ Updated! Want to edit anything else?');
             }
         }
@@ -422,12 +412,14 @@ class EditProfileConversation {
     }
 }
 
-// Entry point
 async function editProfile(conversation: Conversation, ctx: Context) {
     const user = await getUserByTelegramId(ctx.from!.id.toString());
+    if (!user) {
+        await ctx.reply('You are not registered yet. Use /start to register.');
+        return;
+    }
     await new EditProfileConversation(conversation, ctx, user).run();
 }
-
 
 async function _embadProjectCaption(caption: string, tag: string, embadingKey: string) {
     const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/embed`, {
@@ -463,7 +455,6 @@ async function handleProjectSubmission(ctx: Context, msgIds: number[], caption: 
     let embadingKey;
     try {
         const firstMsg = msgIds[0];
-        // make it incremantal if there are multiple messages (to prevent accepting incremtnat messages if its jumps we throw error cuz latter on its cuse error while we put firstmessag:lenght on calllback data)
         msgIds = msgIds.map((_, index) => firstMsg + index);
         embadingKey = `${EDC_ADMIN_GROUP_ID}/${EDC_ADMIN_GROUP_PROJECT_TOPIC_ID}/${firstMsg}`;
         embadingKey = await _embadProjectCaption(caption, projectType, embadingKey);
@@ -475,7 +466,6 @@ async function handleProjectSubmission(ctx: Context, msgIds: number[], caption: 
             { message_thread_id: EDC_ADMIN_GROUP_PROJECT_TOPIC_ID }
         );
 
-        // userId/firstMsgId:count/action
         const reviewKbd = new InlineKeyboard()
             .text('✅ Accept', `pro_review:${ctx.from?.id}/${firstMsg}:${msgIds.length}/accept`)
             .text('❌ Reject', `pro_review:${ctx.from?.id}/${firstMsg}:${msgIds.length}/reject`);
@@ -491,7 +481,6 @@ async function handleProjectSubmission(ctx: Context, msgIds: number[], caption: 
         await ctx.reply('✅ Submitted! You will be notified after review.');
         return;
     } catch (error) {
-        // clear embedding if failed
         if (embadingKey) {
             await _deleteEmbading(embadingKey);
         }
@@ -502,7 +491,6 @@ async function handleProjectSubmission(ctx: Context, msgIds: number[], caption: 
 }
 
 async function handleProjectReview(ctx: Context) {
-    // answer immediately before doing anything else, ignore if expired
     await ctx.answerCallbackQuery().catch(() => { });
     try {
         const [, userId, firstMsgId, count, action] = ctx.match as string[];
@@ -520,31 +508,29 @@ async function handleProjectReview(ctx: Context) {
             reply_markup: new InlineKeyboard().text(btnText, 'noop')
         }
         if (action === 'reject') {
-            // delete embedding
             await _deleteEmbading(embeddingKey);
-            // notfiy user its rejected
             const msg = await ctx.api.copyMessages(userId, userId, msgIds);
             ctx.api.sendMessage(userId, '❌ Your project has been rejected,please review it and resubmit back', { reply_parameters: { message_id: msg[0].message_id } });
         } else {
-            //send to channel
             const user = await getUserByTelegramId(userId);
             if (!user) {
                 console.error('User not found for telegram id:', userId);
                 return;
             }
             const msg = await ctx.api.copyMessages(EDC_CHANNEL_USERNAME, userId, msgIds);
-            await db.insert(userProjects).values({
-                userId: user.id,
-                postLink: `/${EDC_CHANNEL_USERNAME.replace("@","")}/${msg[0].message_id}`,
-                embeddingKey,
-                tag,
-                status: 'active'
+            await db.userProject.create({
+                data: {
+                    userId: user.id,
+                    postLink: `/${EDC_CHANNEL_USERNAME.replace("@","")}/${msg[0].message_id}`,
+                    embeddingKey,
+                    tag,
+                    status: 'active'
+                }
             });
             const profileLink = `${process.env.NEXT_PUBLIC_APP_URL}/talents/${user.id}`;
             await ctx.api.sendMessage(EDC_CHANNEL_USERNAME, `#Project Submited by: [${user.fullName}](${profileLink})`, { parse_mode: 'Markdown', reply_parameters: { message_id: msg[0].message_id } });
         }
 
-        // for group review status
         await ctx.editMessageReplyMarkup(reviewStatusMarkup);
     } catch (error) {
         console.error('Error handling project review:', error);
@@ -561,7 +547,6 @@ async function handlePodcastSuggestion(ctx: Context) {
         return;
     }
 
-    // LinkedIn profile or X/Twitter profile URL
     const profileRegex =
         /^https?:\/\/(www\.)?(linkedin\.com\/in\/[a-zA-Z0-9-_%]+|(x\.com|twitter\.com)\/[a-zA-Z0-9_]+)\/?$/i;
 
@@ -593,10 +578,10 @@ function serviceMenu() {
             const tgId = ctx.from?.id.toString();
             const user = await getUserByTelegramId(tgId!);
 
-            const currentUserServices = await db.query.userServices.findMany({
-                where: (tbl) => eq(tbl.userId, user!.id)
+            const currentUserServices = await db.userService.findMany({
+                where: { userId: user!.id }
             });
-            const services = await db.query.services.findMany();
+            const services = await db.service.findMany();
 
             const selectedServiceIds = new Set(currentUserServices.map(us => us.serviceId));
 
@@ -608,23 +593,30 @@ function serviceMenu() {
                     const tgId = ctx.from?.id.toString()!;
                     const user = await getUserByTelegramId(tgId);
 
-                    const existing = await db.query.userServices.findFirst({
-                        where: (tbl) => and(
-                            eq(tbl.userId, user!.id),
-                            eq(tbl.serviceId, service.id)
-                        )
+                    const existing = await db.userService.findUnique({
+                        where: {
+                            userId_serviceId: {
+                                userId: user!.id,
+                                serviceId: service.id
+                            }
+                        }
                     });
 
                     if (existing) {
-                        await db.delete(userServices)
-                            .where(and(
-                                eq(userServices.userId, user!.id),
-                                eq(userServices.serviceId, service.id)
-                            ));
+                        await db.userService.delete({
+                            where: {
+                                userId_serviceId: {
+                                    userId: user!.id,
+                                    serviceId: service.id
+                                }
+                            }
+                        });
                     } else {
-                        await db.insert(userServices).values({
-                            userId: user!.id,
-                            serviceId: service.id,
+                        await db.userService.create({
+                            data: {
+                                userId: user!.id,
+                                serviceId: service.id,
+                            }
                         });
                     }
 
@@ -654,15 +646,21 @@ async function linkSocialAccount(ctx: Context) {
     const tgId = ctx.from?.id.toString();
     try {
         const user = await getUserByTelegramId(tgId!);
-        // add or update socail links
-        await db.insert(socialLinks).values({
-            userId: user!.id,
-            platform,
-            username
-        }).onDuplicateKeyUpdate({
-            set: {
+        await db.socialLink.upsert({
+            where: {
+                userId_platform: {
+                    userId: user!.id,
+                    platform
+                }
+            },
+            update: {
                 username
             },
+            create: {
+                userId: user!.id,
+                platform,
+                username
+            }
         });
         await ctx.reply(`Linked ${platform} account: ${username}`);
 
@@ -687,10 +685,11 @@ function profileVisibilityMenu() {
         }).row()
         range.text(label, async (ctx) => {
             const tgId = ctx.from?.id.toString()!;
-            const freshUser = await getUserByTelegramId(tgId); // ← re-fetch
-            await db.update(users).set({
-                isActive: !freshUser?.isActive
-            }).where(eq(users.telegramId, tgId));
+            const freshUser = await getUserByTelegramId(tgId);
+            await db.user.update({
+                where: { telegramId: tgId },
+                data: { isActive: !freshUser?.isActive }
+            });
             ctx.menu.update();
         }).row();
 
