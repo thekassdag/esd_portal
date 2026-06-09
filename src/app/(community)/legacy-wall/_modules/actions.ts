@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { Contributor } from "./types";
 
 export async function getLegacyEvents(
   page: number = 1,
@@ -21,8 +22,28 @@ export async function getLegacyEvents(
       events.pop();
     }
 
+    // Parse contributors JSON string and serialize dates for client
+    const serializedEvents = events.map((event) => {
+      let contributors: Contributor[] = [];
+      try {
+        if (event.contributors) {
+          const parsed = JSON.parse(event.contributors);
+          contributors = Array.isArray(parsed) ? parsed : [];
+        }
+      } catch {
+        contributors = [];
+      }
+
+      return {
+        ...event,
+        contributors,
+        eventDate: event.eventDate.toISOString(),
+        createdAt: event.createdAt.toISOString(),
+      };
+    });
+
     return {
-      data: events,
+      data: serializedEvents,
       page,
       hasNextPage,
     };

@@ -7,7 +7,6 @@ import { formatDate } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsers, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { Contributor } from "../_modules/types";
 import { useRef, useCallback } from "react";
 
 export function LegacyWallPage() {
@@ -55,7 +54,7 @@ export function LegacyWallPage() {
       <div className="timeline-container">
         <VerticalTimeline lineColor="hsl(var(--border))" animate={true}>
           {events.map((event, index) => {
-            const contributors = event.contributors as Contributor[] | null;
+            const contributors = event.contributors;
 
             return (
               <VerticalTimelineElement
