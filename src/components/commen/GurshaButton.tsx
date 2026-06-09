@@ -1,6 +1,8 @@
+"use client";
+
 import { SupportButton } from "@gurshaplus/sdk";
 
-export default function GurshaButton({ label, creator, className = "" }: {label:string,creator:string,className?:string}) {
+export default function GurshaButton({ label, creator, className = "" }: { label: string, creator: string, className?: string }) {
     return (
         <SupportButton
             label={label}

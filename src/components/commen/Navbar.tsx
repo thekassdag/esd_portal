@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { Avatar, AvatarImage } from "src/components/ui/avatar";
 import { usePathname } from "next/navigation";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleDollarToSlot } from "@fortawesome/free-solid-svg-icons";
 import GurshaButton from "./GurshaButton";
 
 
@@ -45,7 +43,7 @@ export default function Navbar({ subs }: { subs: number | string }) {
       {!isTalentPage && (
         <GurshaButton
           label="Dontate"
-          creator={process.env.EDC_GURSHAPLUS!}
+          creator={process.env.NEXT_PUBLIC_EDC_GURSHAPLUS!}
         />
       )}
     </nav>
