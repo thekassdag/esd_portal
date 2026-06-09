@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import { useProjects } from "@/app/(community)/_modules/hooks";
 import { ProjectCard } from "./ProjectCard";
 import Masonry from "react-masonry-css";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
 const breakpointColumnsObj = {
   default: 2,
@@ -58,12 +60,14 @@ export function ProjectsPage() {
       )}
 
       {/* Match count */}
-      <p className="text-sm text-muted-foreground mb-5 font-medium">
-        Showing{" "}
-        <span className="text-primary font-semibold">
-          {projects.length} {projects.length === 1 ? "project" : "projects"}
-        </span>
-      </p>
+      {!(isLoading && projects.length === 0) && (
+        <p className="text-sm text-muted-foreground mb-5 font-medium">
+          Showing{" "}
+          <span className="text-primary font-semibold">
+            {projects.length} {projects.length === 1 ? "project" : "projects"}
+          </span>
+        </p>
+      )}
 
       {projects.length > 0 && (
         <Masonry
@@ -87,10 +91,8 @@ export function ProjectsPage() {
       )}
 
       {isLoading && (
-        <div className="flex justify-center mt-6">
-          <div className="text-center py-4 text-sm text-muted-foreground">
-            Loading...
-          </div>
+        <div className="flex justify-center mt-6 py-4">
+          <FontAwesomeIcon icon={faCircleNotch} className="w-6 h-6 animate-spin text-primary" />
         </div>
       )}
 

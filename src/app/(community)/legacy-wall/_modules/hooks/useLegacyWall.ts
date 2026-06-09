@@ -13,7 +13,7 @@ export function useLegacyWall({
   const [events, setEvents] = useState<LegacyEvent[]>([]);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -32,9 +32,13 @@ export function useLegacyWall({
           limit
         );
 
-        setEvents((prev) =>
-          isLoadMore ? [...prev, ...response.data] : response.data
-        );
+        setEvents((prev) => {
+          if (!isLoadMore) return response.data;
+          const newItems = response.data.filter(
+            (item: any) => !prev.some((p: any) => p.id === item.id)
+          );
+          return [...prev, ...newItems];
+        });
         setHasNextPage(response.hasNextPage);
         setPage(response.page);
       } catch (err) {

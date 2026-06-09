@@ -18,7 +18,7 @@ export function useUsers({
   const [serviceId, setServiceId] = useState(initialServiceId);
   const [page, setPage] = useState(1);
   const [hasNextPage, setHasNextPage] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
@@ -41,9 +41,13 @@ export function useUsers({
           limit
         );
 
-        setUsers((prev) =>
-          isLoadMore ? [...prev, ...response.data] : response.data
-        );
+        setUsers((prev) => {
+          if (!isLoadMore) return response.data;
+          const newItems = response.data.filter(
+            (item: any) => !prev.some((p: any) => p.id === item.id)
+          );
+          return [...prev, ...newItems];
+        });
         setHasNextPage(response.hasNextPage);
         setPage(response.page);
       } catch (err) {

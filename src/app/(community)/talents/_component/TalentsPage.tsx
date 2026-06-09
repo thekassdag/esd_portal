@@ -4,6 +4,8 @@ import { useEffect, useRef, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { useUsers } from "../_modules/hooks";
 import { UserCard } from "./UserCard";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
 export function TalentsPage() {
     const searchParams = useSearchParams();
@@ -38,9 +40,11 @@ export function TalentsPage() {
     return (
         <div>
             {/* Match count */}
-            <p className="text-sm text-muted-foreground mb-5 font-medium">
-                Showing <span className="text-primary font-semibold">{users.length} {users.length === 1 ? 'match' : 'matches'}</span>
-            </p>
+            {!(isLoading && users.length === 0) && (
+                <p className="text-sm text-muted-foreground mb-5 font-medium">
+                    Showing <span className="text-primary font-semibold">{users.length} {users.length === 1 ? 'match' : 'matches'}</span>
+                </p>
+            )}
 
             {/* Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -55,10 +59,8 @@ export function TalentsPage() {
             </div>
 
             {isLoading && (
-                <div className="flex justify-center mt-6">
-                    <div className="text-center py-4 text-sm text-muted-foreground">
-                        Loading...
-                    </div>
+                <div className="flex justify-center mt-6 py-4">
+                    <FontAwesomeIcon icon={faCircleNotch} className="w-6 h-6 animate-spin text-primary" />
                 </div>
             )}
             
