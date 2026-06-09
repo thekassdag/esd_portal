@@ -92,7 +92,7 @@ class OnboardingConversation {
 
         const uniSelectMarkup = new InlineKeyboard();
         for (const uni of universityList) {
-            uniSelectMarkup.text(uni.name, `selected_uni:${uni.shortName}`).row();
+            uniSelectMarkup.text(uni.name, `selected_uni:${uni.id}`).row();
         }
 
         const msg = await this.ctx.reply('🎓 Select your university:', { reply_markup: uniSelectMarkup });
@@ -496,9 +496,9 @@ async function handleProjectReview(ctx: Context) {
         const [, userId, firstMsgId, count, action] = ctx.match as string[];
         const msg = ctx.callbackQuery?.message;
         const tagEntity = msg?.entities?.find((entity) => entity.type === 'hashtag');
-        if(!tagEntity) return;
-        const tag = msg?.text?.slice(tagEntity.offset+1, tagEntity.offset + tagEntity.length);
-        if(!tag) return;
+        if (!tagEntity) return;
+        const tag = msg?.text?.slice(tagEntity.offset + 1, tagEntity.offset + tagEntity.length);
+        if (!tag) return;
 
         const msgIds = Array.from({ length: Number(count) }, (_, i) => Number(firstMsgId) + i);
         const embeddingKey = `${EDC_ADMIN_GROUP_ID}/${EDC_ADMIN_GROUP_PROJECT_TOPIC_ID}/${firstMsgId}`;
@@ -521,7 +521,7 @@ async function handleProjectReview(ctx: Context) {
             await prisma.userProject.create({
                 data: {
                     userId: user.id,
-                    postLink: `/${EDC_CHANNEL_USERNAME.replace("@","")}/${msg[0].message_id}`,
+                    postLink: `/${EDC_CHANNEL_USERNAME.replace("@", "")}/${msg[0].message_id}`,
                     embeddingKey,
                     tag,
                     status: 'active'
@@ -698,4 +698,4 @@ function profileVisibilityMenu() {
 }
 
 
-export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile,handlePodcastSuggestion };
+export { onboarding, getUserByTelegramId, serviceMenu, linkSocialAccount, profileVisibilityMenu, handleProjectSubmission, handleProjectReview, editProfile, handlePodcastSuggestion };

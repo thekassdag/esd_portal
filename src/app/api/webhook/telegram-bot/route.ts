@@ -77,11 +77,11 @@ https://edc.antsar.et
 bot.command('suggest', (ctx) => handlePodcastSuggestion(ctx));
 
 //register conversation
-bot.use(createConversation(onboarding));
+bot.use(createConversation(onboarding, 'onboarding'));
 bot.command('register', async (ctx) => await ctx.conversation.enter('onboarding'));
 
 // edit profile conversation
-bot.use(createConversation(editProfile));
+bot.use(createConversation(editProfile, 'editProfile'));
 
 // /service
 bot.use(serviceMenu());
