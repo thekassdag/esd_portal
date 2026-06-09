@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# East Devs Community (EDC) Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Welcome to the **East Devs Community (EDC)** platform! 
 
-Currently, two official plugins are available:
+- **Project URL:** [https://edc.antsar.et](https://edc.antsar.et)
+- **Community:** [https://t.me/east_devs_community](https://t.me/east_devs_community)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Folder Structure
 
-## React Compiler
+We follow a **Modular Architecture** to keep the codebase clean, scalable, and easy to navigate. Here are our core folder structure rules:
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **`src/app/`**: Handles Next.js routing, pages, and layouts. Keep business logic outside of page files when possible.
+- **`src/components/`**: UI components are organized modularly. 
+  - `ui/`: Generic, reusable, and stateless UI components (e.g., buttons, inputs).
+  - `commen/`: Shared components used across different features of the platform.
+- **`src/lib/`**: Core utilities, database clients (`prisma.ts`), and third-party integrations (`telegram-bot.ts`).
+- **`src/hooks/`**: Reusable custom React hooks.
+- **Feature Separation**: Where applicable, keep related logic, components, and utilities close to their respective domains.
 
-## Expanding the ESLint configuration
+Here is an overview of the project's directory tree:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+.
+├── docs
+│   ├── api.md
+│   ├── db.md
+│   ├── test.js
+│   └── web
+├── prisma
+│   ├── schema.prisma
+│   └── seed.ts
+├── public
+│   ├── favicon.svg
+│   ├── icons.svg
+│   └── logo.jpg
+├── src
+│   ├── app
+│   │   ├── api
+│   │   ├── (community)
+│   │   ├── files
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   └── tw-animate.css
+│   ├── assets
+│   ├── components
+│   │   ├── commen
+│   │   └── ui
+│   ├── generated
+│   │   └── prisma
+│   ├── hooks
+│   └── lib
+├── package.json
+├── next.config.js
+├── tailwind.config.js
+└── ...other configuration files
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Local Environment Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+To run and implement this project on your local environment, you will need the following installed:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- **Node.js**: (Version compatible with Next.js & Prisma)
+- **Database**: **MariaDB 10.6.27-MariaDB - MariaDB Server**
+
+### Setup Instructions
+
+1. Clone the repository and install dependencies:
+   ```bash
+   npm install
+   ```
+2. Set up your `.env` file with your local MariaDB credentials.
+3. Run Prisma database generation and push the schema:
+   ```bash
+   npx prisma generate
+   npx prisma db push
+   ```
+4. Start the development server:
+   ```bash
+   npm run dev
+   ```
+
+## Contributing
+
+We welcome contributions from the community! 
+
+Anybody who contributes to the project will be listed on our **[Legacy Wall](https://edc.antsar.et/legacy-wall)** as a token of appreciation for helping build and improve our platform.
+
+Thank you for being part of the East Devs Community!
