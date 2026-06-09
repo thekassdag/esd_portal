@@ -2,7 +2,7 @@ import { Context, InlineKeyboard } from 'grammy';
 import {
     type Conversation, ConversationFlavor
 } from '@grammyjs/conversations';
-import { db } from '@/db';
+import prisma from '@/lib/prisma';
 import { Menu } from '@grammyjs/menu';
 import { PLATFORMS } from '@/lib/constants';
 
@@ -11,7 +11,7 @@ const EDC_CHANNEL_USERNAME = process.env.EDC_CHANNEL_USERNAME!;
 const EDC_ADMIN_GROUP_PROJECT_TOPIC_ID = parseInt(process.env.EDC_ADMIN_GROUP_PROJECT_TOPIC_ID!);
 
 async function getUserByTelegramId(telegramId: string) {
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
         where: { telegramId },
     });
     return user;
@@ -80,7 +80,7 @@ class OnboardingConversation {
     }
 
     private async askForUniversity(): Promise<string | null> {
-        const universityList = await db.university.findMany({
+        const universityList = await prisma.university.findMany({
             orderBy: { name: 'asc' },
             take: 50,
         });
@@ -108,7 +108,7 @@ class OnboardingConversation {
     }
 
     private async askForDepartment(): Promise<string | null> {
-        const departmentList = await db.department.findMany({
+        const departmentList = await prisma.department.findMany({
             orderBy: { name: 'asc' },
             take: 50,
         });
@@ -199,7 +199,7 @@ class OnboardingConversation {
         const bio = await this.askForBio();
         const profileImageId = await this.askForProfileImage() || null;
 
-        await db.user.create({
+        await prisma.user.create({
             data: {
                 fullName,
                 telegramId: this.ctx.from?.id.toString(),
@@ -303,7 +303,7 @@ class EditProfileConversation {
     }
 
     private async editUniversity(): Promise<string | null> {
-        const universityList = await db.university.findMany({ orderBy: { name: 'asc' }, take: 50 });
+        const universityList = await prisma.university.findMany({ orderBy: { name: 'asc' }, take: 50 });
         if (!universityList.length) {
             await this.ctx.reply('No universities available.');
             return null;
@@ -322,7 +322,7 @@ class EditProfileConversation {
     }
 
     private async editDepartment(): Promise<string | null> {
-        const departmentList = await db.department.findMany({ orderBy: { name: 'asc' }, take: 50 });
+        const departmentList = await prisma.department.findMany({ orderBy: { name: 'asc' }, take: 50 });
         if (!departmentList.length) {
             await this.ctx.reply('No departments available.');
             return null;
@@ -399,7 +399,7 @@ class EditProfileConversation {
             }
 
             if (Object.keys(updates).length) {
-                await db.user.update({
+                await prisma.user.update({
                     where: { telegramId: this.ctx.from!.id.toString() },
                     data: updates
                 });
@@ -518,7 +518,7 @@ async function handleProjectReview(ctx: Context) {
                 return;
             }
             const msg = await ctx.api.copyMessages(EDC_CHANNEL_USERNAME, userId, msgIds);
-            await db.userProject.create({
+            await prisma.userProject.create({
                 data: {
                     userId: user.id,
                     postLink: `/${EDC_CHANNEL_USERNAME.replace("@","")}/${msg[0].message_id}`,
@@ -578,10 +578,10 @@ function serviceMenu() {
             const tgId = ctx.from?.id.toString();
             const user = await getUserByTelegramId(tgId!);
 
-            const currentUserServices = await db.userService.findMany({
+            const currentUserServices = await prisma.userService.findMany({
                 where: { userId: user!.id }
             });
-            const services = await db.service.findMany();
+            const services = await prisma.service.findMany();
 
             const selectedServiceIds = new Set(currentUserServices.map(us => us.serviceId));
 
@@ -593,7 +593,7 @@ function serviceMenu() {
                     const tgId = ctx.from?.id.toString()!;
                     const user = await getUserByTelegramId(tgId);
 
-                    const existing = await db.userService.findUnique({
+                    const existing = await prisma.userService.findUnique({
                         where: {
                             userId_serviceId: {
                                 userId: user!.id,
@@ -603,7 +603,7 @@ function serviceMenu() {
                     });
 
                     if (existing) {
-                        await db.userService.delete({
+                        await prisma.userService.delete({
                             where: {
                                 userId_serviceId: {
                                     userId: user!.id,
@@ -612,7 +612,7 @@ function serviceMenu() {
                             }
                         });
                     } else {
-                        await db.userService.create({
+                        await prisma.userService.create({
                             data: {
                                 userId: user!.id,
                                 serviceId: service.id,
@@ -646,7 +646,7 @@ async function linkSocialAccount(ctx: Context) {
     const tgId = ctx.from?.id.toString();
     try {
         const user = await getUserByTelegramId(tgId!);
-        await db.socialLink.upsert({
+        await prisma.socialLink.upsert({
             where: {
                 userId_platform: {
                     userId: user!.id,
@@ -686,7 +686,7 @@ function profileVisibilityMenu() {
         range.text(label, async (ctx) => {
             const tgId = ctx.from?.id.toString()!;
             const freshUser = await getUserByTelegramId(tgId);
-            await db.user.update({
+            await prisma.user.update({
                 where: { telegramId: tgId },
                 data: { isActive: !freshUser?.isActive }
             });
